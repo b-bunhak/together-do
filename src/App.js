@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -29,11 +29,20 @@ const App = () => {
 		setItems(novoItems);
 	}
 
-	function modificarItem(item) {
+	function editarItem(item) {
 		const novoItems = new Map(items);
 
 		if (item.id && novoItems.has(item.id)) {
 			novoItems.set(item.id, { ...item });
+			setItems(novoItems);
+		}
+	}
+
+	function deletarItem(id) {
+		const novoItems = new Map(items);
+
+		if (id && novoItems.has(id)) {
+			novoItems.delete(id);
 			setItems(novoItems);
 		}
 	}
@@ -73,20 +82,19 @@ const App = () => {
 									<Visualizar
 										{...routeProps}
 										inicial={items.get(id)}
-										modificarItem={modificarItem}
+										editarItem={editarItem}
+										deletarItem={() => {
+											deletarItem(id);
+										}}
 									/>
 								);
 							} else {
-								return <div>Item nao encontrado</div>;
+								return <Redirect to="/" />;
 							}
 						}}
 					/>
 
-					<Route
-						render={routeProps => {
-							return <div {...routeProps}>idk</div>;
-						}}
-					/>
+					<Route render={() => <Redirect to="/" />} />
 				</Switch>
 			</React.Fragment>
 		</MuiPickersUtilsProvider>

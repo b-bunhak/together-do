@@ -15,7 +15,7 @@ const styles = theme => ({
 	}
 });
 
-const Visualizar = ({ classes, history, inicial, editarItem }) => {
+const Visualizar = ({ classes, history, inicial, editarItem, deletarItem }) => {
 	return (
 		<div className={classes.pagina}>
 			<Formulario
@@ -24,6 +24,7 @@ const Visualizar = ({ classes, history, inicial, editarItem }) => {
 					editarItem(v);
 				}}
 				cancelar={() => history.replace('/')}
+				deletar={deletarItem}
 			/>
 		</div>
 	);

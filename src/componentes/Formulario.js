@@ -57,7 +57,7 @@ const Formulario = ({ classes, inicial, submit, cancelar, deletar }) => {
 				});
 			}}
 		>
-			{({ status, errors }) =>
+			{({ values, status, errors }) =>
 				status.submitted && Object.keys(errors).length < 1 ? (
 					<Redirect to="/" />
 				) : (
