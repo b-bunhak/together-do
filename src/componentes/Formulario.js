@@ -10,6 +10,10 @@ import Button from '@material-ui/core/Button';
 
 import red from '@material-ui/core/colors/red';
 
+import FormLabel from '@material-ui/core/FormLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Checkbox from '@material-ui/core/Checkbox';
+
 import { Redirect } from 'react-router-dom';
 
 import * as yup from 'yup';
@@ -24,10 +28,17 @@ const styles = theme => ({
 	},
 	botaoDiv: {
 		display: 'flex',
-		justifyContent: 'flex-end',
-		marginTop: theme.spacing(1),
-		'& > *': {
-			marginLeft: theme.spacing(1)
+		justifyContent: 'space-between',
+		marginTop: theme.spacing(1)
+	},
+	feitoContainer: {
+		display: 'flex',
+		justifyContent: 'space-between',
+		'& > span': {
+			display: 'flex',
+			alignItems: 'center',
+			alignText: 'middle',
+			padding: theme.spacing(2)
 		}
 	}
 });
@@ -40,10 +51,11 @@ yup.setLocale({
 });
 
 const schema = yup.object().shape({
-	item: yup.string().required()
+	item: yup.string().required(),
+	feito: yup.boolean().required()
 });
 
-const inicialPadrao = { item: '' };
+const inicialPadrao = { item: '', feito: false };
 
 const Formulario = ({ classes, inicial, submit, cancelar, deletar }) => {
 	return (
@@ -57,7 +69,7 @@ const Formulario = ({ classes, inicial, submit, cancelar, deletar }) => {
 				});
 			}}
 		>
-			{({ values, status, errors }) =>
+			{({ status, errors }) =>
 				status.submitted && Object.keys(errors).length < 1 ? (
 					<Redirect to="/" />
 				) : (
@@ -75,6 +87,18 @@ const Formulario = ({ classes, inicial, submit, cancelar, deletar }) => {
 								/>
 							)}
 						</Field>
+
+						<Field name="feito">
+							{({ field: { value, ...field } }) => (
+								<FormControl fullWidth>
+									<FormLabel className={classes.feitoContainer}>
+										<span>Feito</span>
+										<Checkbox {...field} checked={!!value} />
+									</FormLabel>
+								</FormControl>
+							)}
+						</Field>
+
 						<div className={classes.botaoDiv}>
 							{typeof deletar === 'function' && (
 								<Button
