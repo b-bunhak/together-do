@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -10,15 +10,32 @@ import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 
 import Lista from './paginas/Lista';
 import Novo from './paginas/Novo';
+import Visualizar from './paginas/Visualizar';
 
 const App = () => {
-	const [items, setItems] = useState(new Map());
+	const [items, setItems] = useState(
+		new Map([
+			['1', { id: '1', item: 'Item' }],
+			['2', { id: '2', item: 'Item 2' }]
+		])
+	);
 
 	function adicionarItem(item) {
 		const novoItems = new Map(items);
-		novoItems.set(novoItems.size + 1, { id: novoItems.size + 1, ...item });
 
+		const itemId = (novoItems.size + 1).toString();
+
+		novoItems.set(itemId, { id: itemId, ...item });
 		setItems(novoItems);
+	}
+
+	function modificarItem(item) {
+		const novoItems = new Map(items);
+
+		if (item.id && novoItems.has(item.id)) {
+			novoItems.set(item.id, { ...item });
+			setItems(novoItems);
+		}
 	}
 
 	return (
@@ -26,19 +43,51 @@ const App = () => {
 			<React.Fragment>
 				<CssBaseline />
 
-				<Route
-					exact
-					path="/"
-					render={routeProps => <Lista {...routeProps} items={items} />}
-				/>
+				<Switch>
+					<Route
+						exact
+						path="/"
+						render={routeProps => <Lista {...routeProps} items={items} />}
+					/>
 
-				<Route
-					exact
-					path="/novo"
-					render={routeProps => (
-						<Novo {...routeProps} adicionarItem={adicionarItem} />
-					)}
-				/>
+					<Route
+						exact
+						path="/novo"
+						render={routeProps => (
+							<Novo {...routeProps} adicionarItem={adicionarItem} />
+						)}
+					/>
+
+					<Route
+						exact
+						path="/:id"
+						render={routeProps => {
+							const {
+								match: {
+									params: { id }
+								}
+							} = routeProps;
+
+							if (id && items.get(id)) {
+								return (
+									<Visualizar
+										{...routeProps}
+										inicial={items.get(id)}
+										modificarItem={modificarItem}
+									/>
+								);
+							} else {
+								return <div>Item nao encontrado</div>;
+							}
+						}}
+					/>
+
+					<Route
+						render={routeProps => {
+							return <div {...routeProps}>idk</div>;
+						}}
+					/>
+				</Switch>
 			</React.Fragment>
 		</MuiPickersUtilsProvider>
 	);

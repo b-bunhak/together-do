@@ -27,7 +27,13 @@ const Lista = ({ classes, items }) => {
 		<div className={classes.pagina}>
 			<List>
 				{[...items.values()].map(item => (
-					<ListItem key={item.id} divider button>
+					<ListItem
+						key={item.id}
+						divider
+						button
+						component={Link}
+						to={`/${item.id}`}
+					>
 						<ListItemText primary={item.item} />
 					</ListItem>
 				))}
