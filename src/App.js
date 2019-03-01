@@ -1,28 +1,28 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
-}
+import { Route } from 'react-router-dom';
+
+import CssBaseline from '@material-ui/core/CssBaseline';
+
+import DateFnsUtils from '@date-io/date-fns';
+
+import { MuiPickersUtilsProvider } from 'material-ui-pickers';
+
+import Lista from './paginas/Lista';
+import Novo from './paginas/Novo';
+
+const App = () => {
+	return (
+		<MuiPickersUtilsProvider utils={DateFnsUtils}>
+			<React.Fragment>
+				<CssBaseline />
+
+				<Route exact path="/" component={Lista} />
+
+				<Route exact path="/novo" component={Novo} />
+			</React.Fragment>
+		</MuiPickersUtilsProvider>
+	);
+};
 
 export default App;
