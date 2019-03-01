@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Route } from 'react-router-dom';
 
@@ -12,14 +12,33 @@ import Lista from './paginas/Lista';
 import Novo from './paginas/Novo';
 
 const App = () => {
+	const [items, setItems] = useState(new Map());
+
+	function adicionarItem(item) {
+		const novoItems = new Map(items);
+		novoItems.set(novoItems.size + 1, { id: novoItems.size + 1, ...item });
+
+		setItems(novoItems);
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
 				<CssBaseline />
 
-				<Route exact path="/" component={Lista} />
+				<Route
+					exact
+					path="/"
+					render={routeProps => <Lista {...routeProps} items={items} />}
+				/>
 
-				<Route exact path="/novo" component={Novo} />
+				<Route
+					exact
+					path="/novo"
+					render={routeProps => (
+						<Novo {...routeProps} adicionarItem={adicionarItem} />
+					)}
+				/>
 			</React.Fragment>
 		</MuiPickersUtilsProvider>
 	);

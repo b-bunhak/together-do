@@ -2,8 +2,6 @@ import React from 'react';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import { withRouter } from 'react-router-dom';
-
 import Formulario from '../componentes/Formulario';
 
 const styles = theme => ({
@@ -17,15 +15,17 @@ const styles = theme => ({
 	}
 });
 
-const Lista = ({ classes, history }) => {
+const Novo = ({ classes, history, adicionarItem }) => {
 	return (
 		<div className={classes.pagina}>
 			<Formulario
-				submit={v => console.log(v)}
+				submit={v => {
+					adicionarItem(v);
+				}}
 				cancelar={() => history.replace('/')}
 			/>
 		</div>
 	);
 };
 
-export default withRouter(withStyles(styles)(Lista));
+export default withStyles(styles)(Novo);

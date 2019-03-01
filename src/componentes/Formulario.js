@@ -10,6 +10,8 @@ import Button from '@material-ui/core/Button';
 
 import red from '@material-ui/core/colors/red';
 
+import { Redirect } from 'react-router-dom';
+
 import * as yup from 'yup';
 
 const styles = theme => ({
@@ -46,50 +48,58 @@ const inicialPadrao = { item: '' };
 const Formulario = ({ classes, inicial, submit, cancelar, deletar }) => {
 	return (
 		<Formik
+			initialStatus={{ submitted: false }}
 			initialValues={inicial || inicialPadrao}
 			validationSchema={schema}
-			onSubmit={submit}
+			onSubmit={(values, { setStatus }) => {
+				Promise.resolve(submit(values)).then(() => {
+					setStatus({ submitted: true });
+				});
+			}}
 		>
-			{() => (
-				<Form>
-					<Field name="item">
-						{({ field, form: { touched, errors } }) => (
-							<TextField
-								{...field}
-								fullWidth
-								margin="normal"
-								label="Item"
-								variant="outlined"
-								error={!!errors[field.name] && !!touched[field.name]}
-								helperText={touched[field.name] && errors[field.name]}
-							/>
-						)}
-					</Field>
+			{({ status, errors }) =>
+				status.submitted && Object.keys(errors).length < 1 ? (
+					<Redirect to="/" />
+				) : (
+					<Form>
+						<Field name="item">
+							{({ field, form: { touched, errors } }) => (
+								<TextField
+									{...field}
+									fullWidth
+									margin="normal"
+									label="Item"
+									variant="outlined"
+									error={!!errors[field.name] && !!touched[field.name]}
+									helperText={touched[field.name] && errors[field.name]}
+								/>
+							)}
+						</Field>
+						<div className={classes.botaoDiv}>
+							{typeof deletar === 'function' && (
+								<Button
+									variant="contained"
+									type="button"
+									className={classes.botaoDeletar}
+									onClick={deletar}
+								>
+									Deletar
+								</Button>
+							)}
 
-					<div className={classes.botaoDiv}>
-						{typeof deletar === 'function' && (
-							<Button
-								variant="contained"
-								type="button"
-								className={classes.botaoDeletar}
-								onClick={deletar}
-							>
-								Deletar
+							{typeof cancelar === 'function' && (
+								<Button variant="contained" type="button" onClick={cancelar}>
+									Cancelar
+								</Button>
+							)}
+
+							<Button variant="contained" type="submit" color="primary">
+								Salvar
 							</Button>
-						)}
-
-						{typeof cancelar === 'function' && (
-							<Button variant="contained" type="button" onClick={cancelar}>
-								Cancelar
-							</Button>
-						)}
-
-						<Button variant="contained" type="submit">
-							Salvar
-						</Button>
-					</div>
-				</Form>
-			)}
+						</div>
+					</Form>
+				)
+			}
 		</Formik>
 	);
 };
