@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
 
 import { Route, Switch, Redirect } from 'react-router-dom';
 
@@ -12,7 +15,29 @@ import Lista from './paginas/Lista';
 import Novo from './paginas/Novo';
 import Visualizar from './paginas/Visualizar';
 
+const config = {
+	apiKey: 'AIzaSyBRYebCm20oXGiGoU9Njl9PtAADQ8OC468',
+	authDomain: 'fazer-dev-4cd5b.firebaseapp.com',
+	databaseURL: 'https://fazer-dev-4cd5b.firebaseio.com',
+	projectId: 'fazer-dev-4cd5b',
+	storageBucket: 'fazer-dev-4cd5b.appspot.com',
+	messagingSenderId: '406109751094'
+};
+firebase.initializeApp(config);
+
 const App = () => {
+	const [usuario, setUsuario] = useState();
+
+	useEffect(() => {
+		return firebase.auth().onAuthStateChanged(user => setUsuario(user));
+	}, []);
+
+	useEffect(() => {
+		if (usuario === null) {
+			firebase.auth().signInAnonymously();
+		}
+	}, [usuario]);
+
 	const [items, setItems] = useState(
 		new Map([
 			['1', { id: '1', item: 'Item', feito: false }],
