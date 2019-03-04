@@ -10,6 +10,9 @@ import AddIcon from '@material-ui/icons/Add';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+
+import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = theme => ({
 	pagina: {
@@ -22,7 +25,7 @@ const styles = theme => ({
 	}
 });
 
-const Lista = ({ classes, items }) => {
+const Lista = ({ classes, items, alterarFeito }) => {
 	return (
 		<div className={classes.pagina}>
 			<List>
@@ -35,6 +38,13 @@ const Lista = ({ classes, items }) => {
 						to={`/${item.id}`}
 					>
 						<ListItemText primary={item.item} />
+
+						<ListItemSecondaryAction>
+							<Checkbox
+								checked={item.feito}
+								onChange={e => alterarFeito(item.id, e.target.checked)}
+							/>
+						</ListItemSecondaryAction>
 					</ListItem>
 				))}
 			</List>

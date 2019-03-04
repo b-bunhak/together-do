@@ -67,7 +67,13 @@ const App = () => {
 					<Route
 						exact
 						path="/"
-						render={routeProps => <Lista {...routeProps} items={items} />}
+						render={routeProps => (
+							<Lista
+								{...routeProps}
+								items={items}
+								alterarFeito={alterarFeito}
+							/>
+						)}
 					/>
 
 					<Route
