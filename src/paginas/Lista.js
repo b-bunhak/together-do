@@ -16,10 +16,12 @@ import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = theme => ({
 	pagina: {
-		padding: theme.spacing(2)
+		padding: theme.spacing(2),
+		paddingBottom: theme.spacing(10)
 	},
+
 	fab: {
-		position: 'absolute',
+		position: 'fixed',
 		bottom: theme.spacing(2),
 		right: theme.spacing(2)
 	}

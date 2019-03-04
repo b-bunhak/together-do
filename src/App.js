@@ -16,7 +16,19 @@ const App = () => {
 	const [items, setItems] = useState(
 		new Map([
 			['1', { id: '1', item: 'Item', feito: false }],
-			['2', { id: '2', item: 'Item 2', feito: false }]
+			['2', { id: '2', item: 'Item 2', feito: false }],
+			['3', { id: '3', item: 'Item 2', feito: false }],
+			['4', { id: '4', item: 'Item 2', feito: false }],
+			['5', { id: '5', item: 'Item 2', feito: false }],
+			['6', { id: '6', item: 'Item 2', feito: false }],
+			['7', { id: '7', item: 'Item 2', feito: false }],
+			['8', { id: '8', item: 'Item 2', feito: false }],
+			['9', { id: '9', item: 'Item 2', feito: false }],
+			['10', { id: '10', item: 'Item 2', feito: false }],
+			['11', { id: '11', item: 'Item 2', feito: false }],
+			['12', { id: '12', item: 'Item 2', feito: false }],
+			['13', { id: '13', item: 'Item 2', feito: false }],
+			['14', { id: '14', item: 'Item 2', feito: false }]
 		])
 	);
 
