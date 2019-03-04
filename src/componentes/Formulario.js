@@ -14,9 +14,14 @@ import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Checkbox from '@material-ui/core/Checkbox';
 
-import { Redirect } from 'react-router-dom';
+import Divider from '@material-ui/core/Divider';
+
+import { Link } from 'react-router-dom';
 
 import * as yup from 'yup';
+
+import IconButton from '@material-ui/core/IconButton';
+import BackIcon from '@material-ui/icons/ArrowBack';
 
 const styles = theme => ({
 	pagina: {
@@ -57,22 +62,41 @@ const schema = yup.object().shape({
 
 const inicialPadrao = { item: '', feito: false };
 
-const Formulario = ({ classes, inicial, submit, cancelar, deletar }) => {
+const Formulario = ({
+	classes,
+	inicial,
+	submit,
+	cancelar,
+	deletar,
+	editar = false,
+	alterarFeito
+}) => {
 	return (
 		<Formik
+			enableReinitialize
 			initialStatus={{ submitted: false }}
 			initialValues={inicial || inicialPadrao}
 			validationSchema={schema}
-			onSubmit={(values, { setStatus }) => {
-				Promise.resolve(submit(values)).then(() => {
-					setStatus({ submitted: true });
-				});
+			onSubmit={values => {
+				return Promise.resolve(submit(values));
 			}}
 		>
-			{({ status, errors }) =>
-				status.submitted && Object.keys(errors).length < 1 ? (
-					<Redirect to="/" />
-				) : (
+			{() => (
+				<>
+					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+						<IconButton component={Link} to="." replace>
+							<BackIcon />
+						</IconButton>
+
+						{!editar && (
+							<Button component={Link} to="?editar=true">
+								Editar
+							</Button>
+						)}
+					</div>
+
+					<Divider />
+
 					<Form>
 						<Field name="item">
 							{({ field, form: { touched, errors } }) => (
@@ -84,46 +108,58 @@ const Formulario = ({ classes, inicial, submit, cancelar, deletar }) => {
 									variant="outlined"
 									error={!!errors[field.name] && !!touched[field.name]}
 									helperText={touched[field.name] && errors[field.name]}
+									inputProps={{ readOnly: !editar }}
 								/>
 							)}
 						</Field>
 
 						<Field name="feito">
-							{({ field: { value, ...field } }) => (
+							{({ field: { value, onChange, ...field } }) => (
 								<FormControl fullWidth>
 									<FormLabel className={classes.feitoContainer}>
 										<span>Feito</span>
-										<Checkbox {...field} checked={!!value} />
+										<Checkbox
+											{...field}
+											checked={!!value}
+											onChange={
+												inicial && alterarFeito
+													? e => {
+															alterarFeito(inicial.id, e.target.checked);
+													  }
+													: onChange
+											}
+										/>
 									</FormLabel>
 								</FormControl>
 							)}
 						</Field>
+						{editar && (
+							<div className={classes.botaoDiv}>
+								{typeof deletar === 'function' && (
+									<Button
+										variant="contained"
+										type="button"
+										className={classes.botaoDeletar}
+										onClick={deletar}
+									>
+										Deletar
+									</Button>
+								)}
 
-						<div className={classes.botaoDiv}>
-							{typeof deletar === 'function' && (
-								<Button
-									variant="contained"
-									type="button"
-									className={classes.botaoDeletar}
-									onClick={deletar}
-								>
-									Deletar
+								{typeof cancelar === 'function' && (
+									<Button variant="contained" type="button" onClick={cancelar}>
+										Cancelar
+									</Button>
+								)}
+
+								<Button variant="contained" type="submit" color="primary">
+									Salvar
 								</Button>
-							)}
-
-							{typeof cancelar === 'function' && (
-								<Button variant="contained" type="button" onClick={cancelar}>
-									Cancelar
-								</Button>
-							)}
-
-							<Button variant="contained" type="submit" color="primary">
-								Salvar
-							</Button>
-						</div>
+							</div>
+						)}
 					</Form>
-				)
-			}
+				</>
+			)}
 		</Formik>
 	);
 };

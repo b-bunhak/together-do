@@ -19,8 +19,11 @@ const Novo = ({ classes, history, adicionarItem }) => {
 	return (
 		<div className={classes.pagina}>
 			<Formulario
+				editar
 				submit={v => {
-					adicionarItem(v);
+					return Promise.resolve(adicionarItem(v)).then(() =>
+						history.replace('/')
+					);
 				}}
 				cancelar={() => history.replace('/')}
 			/>

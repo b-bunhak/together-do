@@ -15,8 +15,8 @@ import Visualizar from './paginas/Visualizar';
 const App = () => {
 	const [items, setItems] = useState(
 		new Map([
-			['1', { id: '1', item: 'Item' }],
-			['2', { id: '2', item: 'Item 2' }]
+			['1', { id: '1', item: 'Item', feito: false }],
+			['2', { id: '2', item: 'Item 2', feito: false }]
 		])
 	);
 
@@ -44,6 +44,17 @@ const App = () => {
 		if (id && novoItems.has(id)) {
 			novoItems.delete(id);
 			setItems(novoItems);
+		}
+	}
+
+	function alterarFeito(id, status) {
+		const item = items.get(id);
+
+		if (item) {
+			editarItem({
+				...item,
+				feito: status === undefined ? item.feito : status
+			});
 		}
 	}
 
@@ -86,6 +97,7 @@ const App = () => {
 										deletarItem={() => {
 											deletarItem(id);
 										}}
+										alterarFeito={alterarFeito}
 									/>
 								);
 							} else {

@@ -15,16 +15,33 @@ const styles = theme => ({
 	}
 });
 
-const Visualizar = ({ classes, history, inicial, editarItem, deletarItem }) => {
+const Visualizar = ({
+	classes,
+	history,
+	location,
+	inicial,
+	editarItem,
+	deletarItem,
+	alterarFeito
+}) => {
+	const params = new URLSearchParams(location.search);
+
+	const editar =
+		params.has('editar') && params.get('editar').toLowerCase() === 'true';
+
 	return (
 		<div className={classes.pagina}>
 			<Formulario
+				editar={editar}
 				inicial={inicial}
 				submit={v => {
-					editarItem(v);
+					return Promise.resolve(editarItem(v)).then(() =>
+						history.replace(location.pathname)
+					);
 				}}
-				cancelar={() => history.replace('/')}
+				cancelar={() => history.replace(location.pathname)}
 				deletar={deletarItem}
+				alterarFeito={alterarFeito}
 			/>
 		</div>
 	);
