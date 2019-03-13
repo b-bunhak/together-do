@@ -5,6 +5,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 import { Route, Switch, Redirect } from 'react-router-dom';
+import { withStyles } from '@material-ui/core/styles';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -12,6 +13,12 @@ import DateFnsUtils from '@date-io/date-fns';
 
 import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Button from '@material-ui/core/Button';
+
+import Login from './paginas/Login';
 import Lista from './paginas/Lista';
 import Novo from './paginas/Novo';
 import Visualizar from './paginas/Visualizar';
@@ -26,18 +33,30 @@ const config = {
 };
 firebase.initializeApp(config);
 
-const App = () => {
+const styles = {
+	sairBotao: {
+		marginLeft: 'auto'
+	},
+	spinnerContainer: {
+		position: 'fixed',
+		height: '100%',
+		width: '100%',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	}
+};
+
+const App = ({ classes }) => {
+	const [usuarioLoading, setUsuarioLoading] = useState(true);
 	const [usuario, setUsuario] = useState();
 
 	useEffect(() => {
-		return firebase.auth().onAuthStateChanged(user => setUsuario(user));
+		firebase.auth().onAuthStateChanged(user => {
+			setUsuario(user);
+			setUsuarioLoading(false);
+		});
 	}, []);
-
-	useEffect(() => {
-		if (usuario === null) {
-			firebase.auth().signInAnonymously();
-		}
-	}, [usuario]);
 
 	const [items, setItems] = useState(new Map());
 
@@ -46,6 +65,8 @@ const App = () => {
 			return firebase
 				.firestore()
 				.collection('items')
+				.where('usuario', '==', usuario.uid)
+				.orderBy('criadoData')
 				.onSnapshot(snapshot => {
 					const items = new Map();
 
@@ -64,7 +85,12 @@ const App = () => {
 			.collection('items')
 			.doc();
 
-		return itemDoc.set({ ...item, id: itemDoc.id });
+		return itemDoc.set({
+			...item,
+			id: itemDoc.id,
+			criadoData: firebase.firestore.FieldValue.serverTimestamp(),
+			usuario: usuario.uid
+		});
 	}
 
 	function editarItem(item) {
@@ -100,65 +126,126 @@ const App = () => {
 		}
 	}
 
+	function AuthRoute({ component: Component, login = false, ...rest }) {
+		if (login) {
+			return (
+				<Route
+					{...rest}
+					render={props =>
+						usuario ? (
+							<Redirect
+								to={{
+									pathname: '/'
+								}}
+							/>
+						) : (
+							<Component {...props} />
+						)
+					}
+				/>
+			);
+		} else {
+			return (
+				<Route
+					{...rest}
+					render={props =>
+						usuario ? (
+							<>
+								<AppBar position="static">
+									<Toolbar>
+										<Button
+											color="inherit"
+											className={classes.sairBotao}
+											onClick={() => firebase.auth().signOut()}
+										>
+											Sair
+										</Button>
+									</Toolbar>
+								</AppBar>
+
+								<Component {...props} />
+							</>
+						) : (
+							<Redirect
+								to={{
+									pathname: '/login',
+									state: { from: props.location }
+								}}
+							/>
+						)
+					}
+				/>
+			);
+		}
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
 				<CssBaseline />
 
-				<Switch>
-					<Route
-						exact
-						path="/"
-						render={routeProps => (
-							<Lista
-								{...routeProps}
-								items={items}
-								alterarFeito={alterarFeito}
-							/>
-						)}
-					/>
+				{usuarioLoading ? (
+					<div className={classes.spinnerContainer}>
+						<CircularProgress />
+					</div>
+				) : (
+					<Switch>
+						<AuthRoute exact path="/login" component={Login} login />
 
-					<Route
-						exact
-						path="/novo"
-						render={routeProps => (
-							<Novo {...routeProps} adicionarItem={adicionarItem} />
-						)}
-					/>
+						<AuthRoute
+							exact
+							path="/"
+							component={routeProps => (
+								<Lista
+									{...routeProps}
+									items={items}
+									alterarFeito={alterarFeito}
+								/>
+							)}
+						/>
 
-					<Route
-						exact
-						path="/:id"
-						render={routeProps => {
-							const {
-								match: {
-									params: { id }
+						<AuthRoute
+							exact
+							path="/novo"
+							component={routeProps => (
+								<Novo {...routeProps} adicionarItem={adicionarItem} />
+							)}
+						/>
+
+						<AuthRoute
+							exact
+							path="/:id"
+							component={routeProps => {
+								const {
+									match: {
+										params: { id }
+									}
+								} = routeProps;
+
+								if (id && items.get(id)) {
+									return (
+										<Visualizar
+											{...routeProps}
+											inicial={items.get(id)}
+											editarItem={editarItem}
+											deletarItem={() => {
+												deletarItem(id);
+											}}
+											alterarFeito={alterarFeito}
+										/>
+									);
+								} else {
+									return <Redirect to="/" />;
 								}
-							} = routeProps;
+							}}
+						/>
 
-							if (id && items.get(id)) {
-								return (
-									<Visualizar
-										{...routeProps}
-										inicial={items.get(id)}
-										editarItem={editarItem}
-										deletarItem={() => {
-											deletarItem(id);
-										}}
-										alterarFeito={alterarFeito}
-									/>
-								);
-							} else {
-								return <Redirect to="/" />;
-							}
-						}}
-					/>
-
-					<Route render={() => <Redirect to="/" />} />
-				</Switch>
+						<AuthRoute component={() => <Redirect to="/" />} />
+					</Switch>
+				)}
 			</React.Fragment>
 		</MuiPickersUtilsProvider>
 	);
 };
 
-export default App;
+export default withStyles(styles)(App);
