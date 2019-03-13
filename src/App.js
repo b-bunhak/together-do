@@ -80,17 +80,33 @@ const App = ({ classes }) => {
 	}, [usuario]);
 
 	function adicionarItem(item) {
-		const itemDoc = firebase
-			.firestore()
-			.collection('items')
-			.doc();
+		const db = firebase.firestore();
 
-		return itemDoc.set({
-			...item,
-			id: itemDoc.id,
-			criadoData: firebase.firestore.FieldValue.serverTimestamp(),
-			usuario: usuario.uid
-		});
+		const ordemRef = db.collection('ordem').doc(usuario.uid);
+
+		return db.runTransaction(transaction =>
+			transaction.get(ordemRef).then(ordemDoc => {
+				const itemDoc = db.collection('items').doc();
+
+				transaction.set(itemDoc, {
+					...item,
+					id: itemDoc.id,
+					criadoData: firebase.firestore.FieldValue.serverTimestamp(),
+					usuario: usuario.uid
+				});
+
+				let ordem;
+				if (!ordemDoc.exists || !Array.isArray(ordemDoc.get('ordem'))) {
+					ordem = [...items.values()].map(item => item.id);
+				} else {
+					ordem = ordemDoc.get('ordem');
+				}
+
+				ordem = [...ordem, itemDoc.id];
+
+				transaction.set(ordemRef, { ordem });
+			})
+		);
 	}
 
 	function editarItem(item) {
