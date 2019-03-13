@@ -59,6 +59,7 @@ const App = ({ classes }) => {
 	}, []);
 
 	const [items, setItems] = useState(new Map());
+	const [ordem, setOrdem] = useState([]);
 
 	useEffect(() => {
 		if (usuario) {
@@ -75,6 +76,18 @@ const App = ({ classes }) => {
 					});
 
 					setItems(items);
+				});
+		}
+	}, [usuario]);
+
+	useEffect(() => {
+		if (usuario) {
+			return firebase
+				.firestore()
+				.collection('ordem')
+				.doc(usuario.uid)
+				.onSnapshot(snapshot => {
+					setOrdem(snapshot.get('ordem'));
 				});
 		}
 	}, [usuario]);
@@ -158,6 +171,15 @@ const App = ({ classes }) => {
 		}
 	}
 
+	function alterarOrdem(ordem) {
+		const ordemRef = firebase
+			.firestore()
+			.collection('ordem')
+			.doc(usuario.uid);
+
+		return ordemRef.set(ordem);
+	}
+
 	function AuthRoute({ component: Component, login = false, ...rest }) {
 		if (login) {
 			return (
@@ -231,6 +253,7 @@ const App = ({ classes }) => {
 								<Lista
 									{...routeProps}
 									items={items}
+									ordem={ordem}
 									alterarFeito={alterarFeito}
 								/>
 							)}
