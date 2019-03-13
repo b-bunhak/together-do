@@ -86,11 +86,11 @@ const App = ({ classes }) => {
 
 		return db.runTransaction(transaction =>
 			transaction.get(ordemRef).then(ordemDoc => {
-				const itemDoc = db.collection('items').doc();
+				const itemRef = db.collection('items').doc();
 
-				transaction.set(itemDoc, {
+				transaction.set(itemRef, {
 					...item,
-					id: itemDoc.id,
+					id: itemRef.id,
 					criadoData: firebase.firestore.FieldValue.serverTimestamp(),
 					usuario: usuario.uid
 				});
@@ -102,7 +102,7 @@ const App = ({ classes }) => {
 					ordem = ordemDoc.get('ordem');
 				}
 
-				ordem = [...ordem, itemDoc.id];
+				ordem = [...ordem, itemRef.id];
 
 				transaction.set(ordemRef, { ordem });
 			})
@@ -122,12 +122,28 @@ const App = ({ classes }) => {
 
 	function deletarItem(id) {
 		if (id && items.has(id)) {
-			const itemDoc = firebase
-				.firestore()
-				.collection('items')
-				.doc(id);
+			const db = firebase.firestore();
 
-			return itemDoc.delete();
+			const ordemRef = db.collection('ordem').doc(usuario.uid);
+
+			return db.runTransaction(transaction =>
+				transaction.get(ordemRef).then(ordemDoc => {
+					const itemRef = db.collection('items').doc(id);
+
+					transaction.delete(itemRef);
+
+					let ordem;
+					if (!ordemDoc.exists || !Array.isArray(ordemDoc.get('ordem'))) {
+						ordem = [...items.values()].map(item => item.id);
+					} else {
+						ordem = ordemDoc.get('ordem');
+					}
+
+					ordem = ordem.filter(ordemId => ordemId !== id);
+
+					transaction.set(ordemRef, { ordem });
+				})
+			);
 		}
 	}
 
