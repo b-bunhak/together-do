@@ -177,7 +177,7 @@ const App = ({ classes }) => {
 			.collection('ordem')
 			.doc(usuario.uid);
 
-		return ordemRef.set(ordem);
+		return ordemRef.set({ ordem });
 	}
 
 	function AuthRoute({ component: Component, login = false, ...rest }) {
@@ -255,6 +255,7 @@ const App = ({ classes }) => {
 									items={items}
 									ordem={ordem}
 									alterarFeito={alterarFeito}
+									alterarOrdem={alterarOrdem}
 								/>
 							)}
 						/>

@@ -14,5 +14,9 @@ service cloud.firestore {
 
       allow delete: if isOwner();
     }
+
+    match /ordem/{usuario} {
+      allow read, write: if request.auth.uid == usuario;
+    }
   }
 }

@@ -14,6 +14,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 
 import Checkbox from '@material-ui/core/Checkbox';
 
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 const styles = theme => ({
 	pagina: {
 		padding: theme.spacing(2),
@@ -27,29 +29,60 @@ const styles = theme => ({
 	}
 });
 
-const Lista = ({ classes, items, alterarFeito }) => {
+const Lista = ({ classes, items, ordem = [], alterarFeito, alterarOrdem }) => {
 	return (
 		<div className={classes.pagina}>
-			<List>
-				{[...items.values()].map(item => (
-					<ListItem
-						key={item.id}
-						divider
-						button
-						component={Link}
-						to={`/${item.id}`}
-					>
-						<ListItemText primary={item.item} />
+			<DragDropContext
+				onDragEnd={result => {
+					if (result.destination) {
+						ordem.splice(
+							result.destination.index,
+							0,
+							ordem.splice(result.source.index, 1)[0]
+						);
 
-						<ListItemSecondaryAction>
-							<Checkbox
-								checked={item.feito}
-								onChange={e => alterarFeito(item.id, e.target.checked)}
-							/>
-						</ListItemSecondaryAction>
-					</ListItem>
-				))}
-			</List>
+						alterarOrdem(ordem);
+					}
+				}}
+			>
+				<Droppable droppableId="droppable">
+					{(provided, snapshot) => (
+						<List {...provided.droppableProps} innerRef={provided.innerRef}>
+							{ordem.map((itemId, index) => {
+								const item = items.get(itemId);
+
+								return (
+									<Draggable key={item.id} draggableId={item.id} index={index}>
+										{(provided, snapshot) => (
+											<ListItem
+												innerRef={provided.innerRef}
+												{...provided.draggableProps}
+												{...provided.dragHandleProps}
+												divider
+												component={Link}
+												to={`/${item.id}`}
+											>
+												<ListItemText primary={item.item} />
+
+												<ListItemSecondaryAction>
+													<Checkbox
+														checked={item.feito}
+														onChange={e =>
+															alterarFeito(item.id, e.target.checked)
+														}
+													/>
+												</ListItemSecondaryAction>
+											</ListItem>
+										)}
+									</Draggable>
+								);
+							})}
+
+							{provided.placeholder}
+						</List>
+					)}
+				</Droppable>
+			</DragDropContext>
 
 			<Link to="/novo">
 				<Fab color="primary" aria-label="Add" className={classes.fab}>
