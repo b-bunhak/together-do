@@ -8,13 +8,12 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 
 import Checkbox from '@material-ui/core/Checkbox';
 
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
+import Box from '@material-ui/core/Box';
 
 const styles = theme => ({
 	pagina: {
@@ -26,6 +25,15 @@ const styles = theme => ({
 		position: 'fixed',
 		bottom: theme.spacing(2),
 		right: theme.spacing(2)
+	},
+	itemLink: {
+		flex: '1',
+		display: 'flex',
+		alignItems: 'center',
+		fontSize: theme.typography.body1.fontSize,
+		textDecoration: 'none',
+		color: 'inherit',
+		padding: theme.spacing(1.5)
 	}
 });
 
@@ -54,25 +62,26 @@ const Lista = ({ classes, items, ordem = [], alterarFeito, alterarOrdem }) => {
 								return (
 									<Draggable key={item.id} draggableId={item.id} index={index}>
 										{(provided, snapshot) => (
-											<ListItem
-												innerRef={provided.innerRef}
+											<Box
+												ref={provided.innerRef}
 												{...provided.draggableProps}
 												{...provided.dragHandleProps}
-												divider
-												component={Link}
-												to={`/${item.id}`}
+												borderBottom={1}
+												borderColor="divider"
+												display="flex"
+												component="li"
 											>
-												<ListItemText primary={item.item} />
+												<Link to={`/${item.id}`} className={classes.itemLink}>
+													{item.item}
+												</Link>
 
-												<ListItemSecondaryAction>
-													<Checkbox
-														checked={item.feito}
-														onChange={e =>
-															alterarFeito(item.id, e.target.checked)
-														}
-													/>
-												</ListItemSecondaryAction>
-											</ListItem>
+												<Checkbox
+													checked={item.feito}
+													onChange={e =>
+														alterarFeito(item.id, e.target.checked)
+													}
+												/>
+											</Box>
 										)}
 									</Draggable>
 								);
