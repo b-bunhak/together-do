@@ -58,6 +58,7 @@ const App = ({ classes }) => {
 		});
 	}, []);
 
+	const [itemsLoading, setItemsLoading] = useState(true);
 	const [items, setItems] = useState(new Map());
 	const [ordem, setOrdem] = useState([]);
 
@@ -76,6 +77,7 @@ const App = ({ classes }) => {
 					});
 
 					setItems(items);
+					setItemsLoading(false);
 				});
 		}
 	}, [usuario]);
@@ -180,124 +182,86 @@ const App = ({ classes }) => {
 		return ordemRef.set({ ordem });
 	}
 
-	function AuthRoute({ component: Component, login = false, ...rest }) {
-		if (login) {
-			return (
-				<Route
-					{...rest}
-					render={props =>
-						usuario ? (
-							<Redirect
-								to={{
-									pathname: '/'
-								}}
-							/>
-						) : (
-							<Component {...props} />
-						)
-					}
-				/>
-			);
-		} else {
-			return (
-				<Route
-					{...rest}
-					render={props =>
-						usuario ? (
-							<>
-								<AppBar position="static">
-									<Toolbar>
-										<Button
-											color="inherit"
-											className={classes.sairBotao}
-											onClick={() => firebase.auth().signOut()}
-										>
-											Sair
-										</Button>
-									</Toolbar>
-								</AppBar>
-
-								<Component {...props} />
-							</>
-						) : (
-							<Redirect
-								to={{
-									pathname: '/login',
-									state: { from: props.location }
-								}}
-							/>
-						)
-					}
-				/>
-			);
-		}
-	}
-
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
 				<CssBaseline />
 
-				{usuarioLoading ? (
+				{usuarioLoading || (usuario && itemsLoading) ? (
 					<div className={classes.spinnerContainer}>
 						<CircularProgress />
 					</div>
+				) : !usuario ? (
+					<Login />
 				) : (
-					<Switch>
-						<AuthRoute exact path="/login" component={Login} login />
+					<>
+						<AppBar position="static">
+							<Toolbar>
+								<Button
+									color="inherit"
+									className={classes.sairBotao}
+									onClick={() => firebase.auth().signOut()}
+								>
+									Sair
+								</Button>
+							</Toolbar>
+						</AppBar>
+						<Switch>
+							{/* <Route exact path="/login" component={Login} login /> */}
 
-						<AuthRoute
-							exact
-							path="/"
-							component={routeProps => (
-								<Lista
-									{...routeProps}
-									items={items}
-									ordem={ordem}
-									alterarFeito={alterarFeito}
-									alterarOrdem={alterarOrdem}
-								/>
-							)}
-						/>
+							<Route
+								exact
+								path="/"
+								render={routeProps => (
+									<Lista
+										{...routeProps}
+										items={items}
+										ordem={ordem}
+										alterarFeito={alterarFeito}
+										alterarOrdem={alterarOrdem}
+									/>
+								)}
+							/>
 
-						<AuthRoute
-							exact
-							path="/novo"
-							component={routeProps => (
-								<Novo {...routeProps} adicionarItem={adicionarItem} />
-							)}
-						/>
+							<Route
+								exact
+								path="/novo"
+								render={routeProps => (
+									<Novo {...routeProps} adicionarItem={adicionarItem} />
+								)}
+							/>
 
-						<AuthRoute
-							exact
-							path="/:id"
-							component={routeProps => {
-								const {
-									match: {
-										params: { id }
+							<Route
+								exact
+								path="/:id"
+								render={routeProps => {
+									const {
+										match: {
+											params: { id }
+										}
+									} = routeProps;
+
+									if (id && items.get(id)) {
+										return (
+											<Visualizar
+												{...routeProps}
+												inicial={items.get(id)}
+												editarItem={editarItem}
+												deletarItem={() => {
+													deletarItem(id);
+												}}
+												alterarFeito={alterarFeito}
+											/>
+										);
+									} else {
+										return <Redirect to="/" />;
 									}
-								} = routeProps;
+								}}
+							/>
 
-								if (id && items.get(id)) {
-									return (
-										<Visualizar
-											{...routeProps}
-											inicial={items.get(id)}
-											editarItem={editarItem}
-											deletarItem={() => {
-												deletarItem(id);
-											}}
-											alterarFeito={alterarFeito}
-										/>
-									);
-								} else {
-									return <Redirect to="/" />;
-								}
-							}}
-						/>
-
-						<AuthRoute component={() => <Redirect to="/" />} />
-					</Switch>
+							<Route render={() => <Redirect to="/" />} />
+						</Switch>
+					</>
 				)}
 			</React.Fragment>
 		</MuiPickersUtilsProvider>
