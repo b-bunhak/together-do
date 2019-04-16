@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import DragHandleIcon from '@material-ui/icons/DragHandle';
 
 import List from '@material-ui/core/List';
 
@@ -48,11 +49,11 @@ const Lista = ({
 	items = [],
 	ordem = [],
 	alterarFeito,
-	alterarOrdem
+	alterarOrdem,
+	ordemTipo,
+	setOrdemTipo
 }) => {
 	const [labelWidth, setLabelWidth] = useState(0);
-
-	const [ordemTipo, setOrdemTipo] = useState();
 
 	const listaOrdem =
 		ordemTipo === 'prioridade'
@@ -116,7 +117,7 @@ const Lista = ({
 										index={index}
 										isDragDisabled={ordemTipo !== 'prioridade'}
 									>
-										{(provided, snapshot) => (
+										{provided => (
 											<Box
 												ref={provided.innerRef}
 												{...provided.draggableProps}
@@ -125,7 +126,10 @@ const Lista = ({
 												borderColor="divider"
 												display="flex"
 												component="li"
+												alignItems="center"
 											>
+												{ordemTipo === 'prioridade' && <DragHandleIcon />}
+
 												<Link to={`/${item.id}`} className={classes.itemLink}>
 													{item.item}
 												</Link>

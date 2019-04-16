@@ -61,6 +61,7 @@ const App = ({ classes }) => {
 	const [itemsLoading, setItemsLoading] = useState(true);
 	const [items, setItems] = useState(new Map());
 	const [ordem, setOrdem] = useState([]);
+	const [ordemTipo, setOrdemTipo] = useState('data');
 
 	useEffect(() => {
 		if (usuario) {
@@ -219,6 +220,8 @@ const App = ({ classes }) => {
 										ordem={ordem}
 										alterarFeito={alterarFeito}
 										alterarOrdem={alterarOrdem}
+										ordemTipo={ordemTipo}
+										setOrdemTipo={setOrdemTipo}
 									/>
 								)}
 							/>
