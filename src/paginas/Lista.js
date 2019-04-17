@@ -127,6 +127,7 @@ const Lista = ({
 												display="flex"
 												component="li"
 												alignItems="center"
+												bgcolor="background.default"
 											>
 												{ordemTipo === 'prioridade' && <DragHandleIcon />}
 
