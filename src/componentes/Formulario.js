@@ -57,10 +57,10 @@ yup.setLocale({
 
 const schema = yup.object().shape({
 	item: yup.string().required(),
-	feito: yup.boolean().required()
+	feito: yup.date().nullable()
 });
 
-const inicialPadrao = { item: '', feito: false };
+const inicialPadrao = { item: '', feito: null };
 
 const Formulario = ({
 	classes,
@@ -69,7 +69,8 @@ const Formulario = ({
 	cancelar,
 	deletar,
 	editar = false,
-	alterarFeito
+	alterarFeito,
+	novo = false
 }) => {
 	return (
 		<Formik
@@ -113,26 +114,29 @@ const Formulario = ({
 							)}
 						</Field>
 
-						<Field name="feito">
-							{({ field: { value, onChange, ...field } }) => (
-								<FormControl fullWidth>
-									<FormLabel className={classes.feitoContainer}>
-										<span>Feito</span>
-										<Checkbox
-											{...field}
-											checked={!!value}
-											onChange={
-												inicial && alterarFeito
-													? e => {
-															alterarFeito(inicial.id, e.target.checked);
-													  }
-													: onChange
-											}
-										/>
-									</FormLabel>
-								</FormControl>
-							)}
-						</Field>
+						{!novo && (
+							<Field name="feito">
+								{({ field: { value, onChange, ...field } }) => (
+									<FormControl fullWidth>
+										<FormLabel className={classes.feitoContainer}>
+											<span>Feito</span>
+											<Checkbox
+												{...field}
+												checked={!!value}
+												onChange={
+													inicial && alterarFeito
+														? e => {
+																alterarFeito(inicial.id, e.target.checked);
+														  }
+														: onChange
+												}
+											/>
+										</FormLabel>
+									</FormControl>
+								)}
+							</Field>
+						)}
+
 						{editar && (
 							<div className={classes.botaoDiv}>
 								{typeof deletar === 'function' && (

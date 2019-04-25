@@ -19,6 +19,7 @@ const Novo = ({ classes, history, adicionarItem }) => {
 	return (
 		<div className={classes.pagina}>
 			<Formulario
+				novo
 				editar
 				submit={v => {
 					return Promise.resolve(adicionarItem(v)).then(() =>

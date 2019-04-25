@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -12,6 +12,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import DateFnsUtils from '@date-io/date-fns';
 
 import { MuiPickersUtilsProvider } from 'material-ui-pickers';
+
+import { partition } from 'lodash';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -60,8 +62,28 @@ const App = ({ classes }) => {
 
 	const [itemsLoading, setItemsLoading] = useState(true);
 	const [items, setItems] = useState(new Map());
+
 	const [ordem, setOrdem] = useState([]);
 	const [ordemTipo, setOrdemTipo] = useState('data');
+
+	const [itemsNaoFeito, itemsFeito] = useMemo(() => {
+		const [naoFeito, feito] = partition(
+			[...items.values()]
+				.sort((item1, item2) => item2.dataCriado - item1.dataCriado)
+				.map(item => item.id),
+			itemId => !items.get(itemId).feito
+		);
+
+		feito.sort(
+			(item1, item2) => items.get(item2).feito - items.get(item1).feito
+		);
+
+		return [naoFeito, feito];
+	}, [items]);
+
+	console.log(itemsNaoFeito, itemsFeito);
+
+	console.log(ordem);
 
 	useEffect(() => {
 		if (usuario) {
@@ -74,7 +96,12 @@ const App = ({ classes }) => {
 					const items = new Map();
 
 					snapshot.forEach(doc => {
-						items.set(doc.id, doc.data());
+						items.set(doc.id, {
+							...doc.data(),
+							criadoData:
+								doc.get('criadoData') && doc.get('criadoData').toDate(),
+							feito: doc.get('feito') && doc.get('feito').toDate()
+						});
 					});
 
 					setItems(items);
@@ -113,7 +140,7 @@ const App = ({ classes }) => {
 
 				let ordem;
 				if (!ordemDoc.exists || !Array.isArray(ordemDoc.get('ordem'))) {
-					ordem = [...items.values()].map(item => item.id);
+					ordem = [...itemsFeito];
 				} else {
 					ordem = ordemDoc.get('ordem');
 				}
@@ -150,7 +177,7 @@ const App = ({ classes }) => {
 
 					let ordem;
 					if (!ordemDoc.exists || !Array.isArray(ordemDoc.get('ordem'))) {
-						ordem = [...items.values()].map(item => item.id);
+						ordem = [...itemsFeito].filter(item => item !== id);
 					} else {
 						ordem = ordemDoc.get('ordem');
 					}
@@ -167,10 +194,40 @@ const App = ({ classes }) => {
 		const item = items.get(id);
 
 		if (item) {
-			editarItem({
-				...item,
-				feito: status === undefined ? item.feito : status
-			});
+			const batch = firebase.firestore().batch();
+
+			if (item.id && items.has(item.id)) {
+				const itemRef = firebase
+					.firestore()
+					.collection('items')
+					.doc(item.id);
+
+				const ordemRef = firebase
+					.firestore()
+					.collection('ordem')
+					.doc(usuario.uid);
+
+				batch.set(
+					itemRef,
+					{
+						...item,
+						feito:
+							status === undefined
+								? item.feito
+								: status === true
+								? new Date()
+								: null,
+						id: itemRef.id
+					},
+					{ merge: true }
+				);
+
+				batch.set(ordemRef, {
+					ordem: ordem.filter(item => item !== itemRef.id)
+				});
+
+				return batch.commit();
+			}
 		}
 	}
 
@@ -207,6 +264,7 @@ const App = ({ classes }) => {
 								</Button>
 							</Toolbar>
 						</AppBar>
+
 						<Switch>
 							{/* <Route exact path="/login" component={Login} login /> */}
 
@@ -218,6 +276,8 @@ const App = ({ classes }) => {
 										{...routeProps}
 										items={items}
 										ordem={ordem}
+										feito={itemsFeito}
+										naoFeito={itemsNaoFeito}
 										alterarFeito={alterarFeito}
 										alterarOrdem={alterarOrdem}
 										ordemTipo={ordemTipo}
