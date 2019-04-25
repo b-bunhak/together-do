@@ -81,10 +81,6 @@ const App = ({ classes }) => {
 		return [naoFeito, feito];
 	}, [items]);
 
-	console.log(itemsNaoFeito, itemsFeito);
-
-	console.log(ordem);
-
 	useEffect(() => {
 		if (usuario) {
 			return firebase
@@ -207,23 +203,27 @@ const App = ({ classes }) => {
 					.collection('ordem')
 					.doc(usuario.uid);
 
+				const feito =
+					status === undefined
+						? item.feito
+						: status === true
+						? new Date()
+						: null;
+
 				batch.set(
 					itemRef,
 					{
 						...item,
-						feito:
-							status === undefined
-								? item.feito
-								: status === true
-								? new Date()
-								: null,
+						feito,
 						id: itemRef.id
 					},
 					{ merge: true }
 				);
 
 				batch.set(ordemRef, {
-					ordem: ordem.filter(item => item !== itemRef.id)
+					ordem: feito
+						? ordem.filter(itemId => itemId !== itemRef.id)
+						: [...ordem, itemRef.id]
 				});
 
 				return batch.commit();
