@@ -10,22 +10,20 @@ import DragHandleIcon from '@material-ui/icons/DragHandle';
 import Typography from '@material-ui/core/Typography';
 
 import List from '@material-ui/core/List';
+import ItemLink from '../componentes/ItemLink';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
+import Button from '@material-ui/core/Button';
 
 import Checkbox from '@material-ui/core/Checkbox';
 
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import Box from '@material-ui/core/Box';
-
-import SwipeableViews from 'react-swipeable-views';
-
-import { partition } from 'lodash';
 
 const styles = theme => ({
 	'@global': {
@@ -44,6 +42,10 @@ const styles = theme => ({
 		flexDirection: 'column'
 	},
 
+	tituloDiv: {
+		display: 'flex'
+	},
+
 	lista: {
 		flex: '1',
 		paddingBottom: theme.spacing(10),
@@ -55,15 +57,6 @@ const styles = theme => ({
 		position: 'fixed',
 		bottom: theme.spacing(2),
 		right: theme.spacing(2)
-	},
-	itemLink: {
-		flex: '1',
-		display: 'flex',
-		alignItems: 'center',
-		fontSize: theme.typography.body1.fontSize,
-		textDecoration: 'none',
-		color: 'inherit',
-		padding: theme.spacing(1.5)
 	}
 });
 
@@ -71,7 +64,6 @@ const Lista = ({
 	classes,
 	items,
 	ordem = [],
-	feito = [],
 	naoFeito = [],
 	alterarFeito,
 	alterarOrdem,
@@ -84,15 +76,21 @@ const Lista = ({
 
 	return (
 		<>
-			{/* <SwipeableViews
-				enableMouseEvents
-				// style={{ flex: 1, display: 'flex' }}
-				// containerStyle={{ flex: 1, overflow: 'none' }}
-			> */}
 			<div className={classes.pagina}>
-				<Typography variant="h3" gutterBottom component="div">
-					A Fazer
-				</Typography>
+				<Box display="flex" alignItems="center" justifyContent="space-between">
+					<Typography variant="h3" gutterBottom component="div">
+						A Fazer
+					</Typography>
+
+					<Button
+						component={Link}
+						to="/feito"
+						variant="outlined"
+						className={classes.button}
+					>
+						Feito
+					</Button>
+				</Box>
 
 				<FormControl variant="outlined" fullWidth>
 					<InputLabel
@@ -165,9 +163,7 @@ const Lista = ({
 												>
 													{ordemTipo === 'prioridade' && <DragHandleIcon />}
 
-													<Link to={`/${item.id}`} className={classes.itemLink}>
-														{item.item}
-													</Link>
+													<ItemLink to={`/${item.id}`}>{item.item}</ItemLink>
 
 													<Checkbox
 														checked={!!item.feito}
@@ -187,41 +183,6 @@ const Lista = ({
 					</Droppable>
 				</DragDropContext>
 			</div>
-			{/* <div className={classes.pagina}>
-					<Typography variant="h3" gutterBottom component="div">
-						Feito
-					</Typography>
-
-					<List>
-						{feito.map(itemId => {
-							const item = items.get(itemId);
-
-							return (
-								<Box
-									key={item.id}
-									borderBottom={1}
-									borderColor="divider"
-									display="flex"
-									component="li"
-									alignItems="center"
-									bgcolor="background.default"
-								>
-									{ordemTipo === 'prioridade' && <DragHandleIcon />}
-
-									<Link to={`/${item.id}`} className={classes.itemLink}>
-										{item.item}
-									</Link>
-
-									<Checkbox
-										checked={!!item.feito}
-										onChange={e => alterarFeito(item.id, e.target.checked)}
-									/>
-								</Box>
-							);
-						})}
-					</List>
-				</div> */}
-			{/* </SwipeableViews> */}
 
 			<Fab
 				color="primary"

@@ -22,6 +22,7 @@ import Button from '@material-ui/core/Button';
 
 import Login from './paginas/Login';
 import Lista from './paginas/Lista';
+import Feito from './paginas/Feito';
 import Novo from './paginas/Novo';
 import Visualizar from './paginas/Visualizar';
 
@@ -276,12 +277,24 @@ const App = ({ classes }) => {
 										{...routeProps}
 										items={items}
 										ordem={ordem}
-										feito={itemsFeito}
 										naoFeito={itemsNaoFeito}
 										alterarFeito={alterarFeito}
 										alterarOrdem={alterarOrdem}
 										ordemTipo={ordemTipo}
 										setOrdemTipo={setOrdemTipo}
+									/>
+								)}
+							/>
+
+							<Route
+								exact
+								path="/feito"
+								render={routeProps => (
+									<Feito
+										{...routeProps}
+										items={items}
+										feito={itemsFeito}
+										alterarFeito={alterarFeito}
 									/>
 								)}
 							/>

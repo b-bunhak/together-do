@@ -23,6 +23,8 @@ import * as yup from 'yup';
 import IconButton from '@material-ui/core/IconButton';
 import BackIcon from '@material-ui/icons/ArrowBack';
 
+import Box from '@material-ui/core/Box';
+
 const styles = theme => ({
 	pagina: {
 		padding: theme.spacing(2)
@@ -84,7 +86,7 @@ const Formulario = ({
 		>
 			{() => (
 				<>
-					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+					<Box display="flex" justifyContent="space-between">
 						<IconButton component={Link} to="." replace>
 							<BackIcon />
 						</IconButton>
@@ -94,7 +96,7 @@ const Formulario = ({
 								Editar
 							</Button>
 						)}
-					</div>
+					</Box>
 
 					<Divider />
 
