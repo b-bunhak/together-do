@@ -79,7 +79,7 @@ const Formulario = ({
 	novo = false
 }) => {
 	const [temDataEntrega, setTemDataEntrega] = useState(
-		Boolean(inicial.dataEntrega)
+		Boolean(inicial && inicial.dataEntrega)
 	);
 
 	const [dataDialogOpen, setDataDialogOpen] = useState(false);
@@ -166,9 +166,12 @@ const Formulario = ({
 												error={Boolean(currentError)}
 												name={field.name}
 												value={field.value}
-												onChange={date =>
-													form.setFieldValue(field.name, date, true)
-												}
+												onChange={date => {
+													form.setFieldValue(
+														field.name,
+														temDataEntrega ? date : null
+													);
+												}}
 												onError={(_, error) =>
 													form.setFieldError(field.name, error)
 												}
@@ -184,7 +187,9 @@ const Formulario = ({
 														setDataDialogOpen(true);
 													}
 												}}
-												onClose={() => setDataDialogOpen(false)}
+												onClose={() => {
+													setDataDialogOpen(false);
+												}}
 											/>
 										</Box>
 									);
