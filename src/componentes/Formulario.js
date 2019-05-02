@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Formik, Form, Field } from 'formik';
 
@@ -13,6 +13,9 @@ import red from '@material-ui/core/colors/red';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Checkbox from '@material-ui/core/Checkbox';
+import Switch from '@material-ui/core/Switch';
+import Collapse from '@material-ui/core/Collapse';
+import { DateTimePicker } from '@material-ui/pickers';
 
 import Divider from '@material-ui/core/Divider';
 
@@ -59,10 +62,11 @@ yup.setLocale({
 
 const schema = yup.object().shape({
 	item: yup.string().required(),
-	feito: yup.date().nullable()
+	feito: yup.date().nullable(),
+	dataEntrega: yup.date().nullable()
 });
 
-const inicialPadrao = { item: '', feito: null };
+const inicialPadrao = { item: '', feito: null, dataEntrega: null };
 
 const Formulario = ({
 	classes,
@@ -74,6 +78,12 @@ const Formulario = ({
 	alterarFeito,
 	novo = false
 }) => {
+	const [temDataEntrega, setTemDataEntrega] = useState(
+		Boolean(inicial.dataEntrega)
+	);
+
+	const [dataDialogOpen, setDataDialogOpen] = useState(false);
+
 	return (
 		<Formik
 			enableReinitialize
@@ -81,10 +91,14 @@ const Formulario = ({
 			initialValues={inicial || inicialPadrao}
 			validationSchema={schema}
 			onSubmit={values => {
-				return Promise.resolve(submit(values));
+				const { dataEntrega, ...v } = values;
+
+				return Promise.resolve(
+					submit({ ...v, dataEntrega: temDataEntrega ? dataEntrega : null })
+				);
 			}}
 		>
-			{() => (
+			{({ values }) => (
 				<>
 					<Box display="flex" justifyContent="space-between">
 						<IconButton component={Link} to="." replace>
@@ -116,6 +130,69 @@ const Formulario = ({
 							)}
 						</Field>
 
+						<Box clone display="flex" justifyContent="space-between">
+							<FormLabel>
+								<Box display="flex" alignItems="center">
+									Data de Entrega
+								</Box>
+								<Switch
+									checked={temDataEntrega}
+									onChange={() => {
+										if (editar) {
+											setTemDataEntrega(!temDataEntrega);
+
+											if (!temDataEntrega && !values.dataEntrega) {
+												setDataDialogOpen(true);
+											}
+										}
+									}}
+									inputProps={{ readOnly: !editar }}
+								/>
+							</FormLabel>
+						</Box>
+
+						<Collapse in={temDataEntrega}>
+							<Field name="dataEntrega">
+								{({ field, form, ...props }) => {
+									const currentError = form.errors[field.name];
+									return (
+										<Box clone mb={1}>
+											<DateTimePicker
+												autoOk
+												open={dataDialogOpen}
+												ampm={false}
+												disablePast
+												helperText={currentError}
+												error={Boolean(currentError)}
+												name={field.name}
+												value={field.value}
+												onChange={date =>
+													form.setFieldValue(field.name, date, true)
+												}
+												onError={(_, error) =>
+													form.setFieldError(field.name, error)
+												}
+												inputVariant="outlined"
+												format="dd/MM/yyyy - HH:mm"
+												fullWidth
+												{...props}
+												cancelLabel="Cancelar"
+												clearLabel="Limpar"
+												inputProps={{ readOnly: !editar }}
+												onOpen={() => {
+													if (editar) {
+														setDataDialogOpen(true);
+													}
+												}}
+												onClose={() => setDataDialogOpen(false)}
+											/>
+										</Box>
+									);
+								}}
+							</Field>
+						</Collapse>
+
+						{/* not really a feild anymore? check if it should be moved */}
 						{!novo && (
 							<Field name="feito">
 								{({ field: { value, onChange, ...field } }) => (

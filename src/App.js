@@ -98,6 +98,8 @@ const App = ({ classes }) => {
 							...doc.data(),
 							criadoData:
 								doc.get('criadoData') && doc.get('criadoData').toDate(),
+							dataEntrega:
+								doc.get('dataEntrega') && doc.get('dataEntrega').toDate(),
 							feito: doc.get('feito') && doc.get('feito').toDate()
 						});
 					});
