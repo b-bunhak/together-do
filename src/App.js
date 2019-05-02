@@ -11,7 +11,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 import DateFnsUtils from '@date-io/date-fns';
 
-import { MuiPickersUtilsProvider } from 'material-ui-pickers';
+//import { MuiPickersUtilsProvider } from 'material-ui-pickers';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 import { partition } from 'lodash';
 
