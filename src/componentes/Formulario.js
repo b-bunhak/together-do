@@ -164,7 +164,6 @@ const Formulario = ({
 												autoOk
 												open={dataDialogOpen}
 												ampm={false}
-												disablePast
 												helperText={currentError}
 												error={Boolean(currentError)}
 												name={field.name}
