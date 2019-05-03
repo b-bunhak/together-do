@@ -119,6 +119,9 @@ const Formulario = ({
 							{({ field, form: { touched, errors } }) => (
 								<TextField
 									{...field}
+									multiline
+									rowsMax={4}
+									type="text"
 									fullWidth
 									margin="normal"
 									label="Item"

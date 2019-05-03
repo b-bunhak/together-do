@@ -53,6 +53,7 @@ const styles = theme => ({
 	},
 
 	itemLink: {
+		minWidth: 0,
 		flex: '1',
 		fontSize: theme.typography.body1.fontSize,
 		textDecoration: 'none',
@@ -171,7 +172,9 @@ const Lista = ({
 													{ordemTipo === 'prioridade' && <DragHandleIcon />}
 
 													<Link to={`/${item.id}`} className={classes.itemLink}>
-														<Typography variant="body1">{item.item}</Typography>
+														<Typography noWrap component="div">
+															{item.item}
+														</Typography>
 														<Box
 															clone
 															mt={0.5}
