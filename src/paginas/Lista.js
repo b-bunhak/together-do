@@ -10,7 +10,6 @@ import DragHandleIcon from '@material-ui/icons/DragHandle';
 import Typography from '@material-ui/core/Typography';
 
 import List from '@material-ui/core/List';
-import ItemLink from '../componentes/ItemLink';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -51,6 +50,15 @@ const styles = theme => ({
 		paddingBottom: theme.spacing(10),
 		overflowY: 'scroll',
 		'-webkit-overflow-scrolling': 'touch'
+	},
+
+	itemLink: {
+		flex: '1',
+
+		fontSize: theme.typography.body1.fontSize,
+		textDecoration: 'none',
+		color: 'inherit',
+		padding: theme.spacing(1.5)
 	},
 
 	fab: {
@@ -163,7 +171,17 @@ const Lista = ({
 												>
 													{ordemTipo === 'prioridade' && <DragHandleIcon />}
 
-													<ItemLink to={`/${item.id}`}>{item.item}</ItemLink>
+													<Link to={`/${item.id}`} className={classes.itemLink}>
+														<Typography variant="body1">{item.item}</Typography>
+														<Box clone mt={0.5}>
+															<Typography variant="body2">
+																{item.dataEntrega &&
+																	item.dataEntrega.toLocaleDateString(
+																		'default'
+																	)}
+															</Typography>
+														</Box>
+													</Link>
 
 													<Checkbox
 														checked={!!item.feito}

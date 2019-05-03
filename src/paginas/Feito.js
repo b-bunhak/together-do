@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 
 import List from '@material-ui/core/List';
-import ItemLink from '../componentes/ItemLink';
 
 import IconButton from '@material-ui/core/IconButton';
 import BackIcon from '@material-ui/icons/ArrowBack';
@@ -38,6 +37,14 @@ const styles = theme => ({
 		paddingBottom: theme.spacing(10),
 		overflowY: 'scroll',
 		'-webkit-overflow-scrolling': 'touch'
+	},
+
+	itemLink: {
+		flex: '1',
+		fontSize: theme.typography.body1.fontSize,
+		textDecoration: 'none',
+		color: 'inherit',
+		padding: theme.spacing(1.5)
 	}
 });
 
@@ -68,7 +75,9 @@ const Feito = ({ classes, items, feito = [], alterarFeito }) => {
 							alignItems="center"
 							bgcolor="background.default"
 						>
-							<ItemLink to={`/${item.id}`}>{item.item}</ItemLink>
+							<Link to={`/${item.id}`} className={classes.itemLink}>
+								{item.item}
+							</Link>
 
 							<Checkbox
 								checked={!!item.feito}
