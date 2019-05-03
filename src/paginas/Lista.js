@@ -54,7 +54,6 @@ const styles = theme => ({
 
 	itemLink: {
 		flex: '1',
-
 		fontSize: theme.typography.body1.fontSize,
 		textDecoration: 'none',
 		color: 'inherit',
@@ -173,11 +172,25 @@ const Lista = ({
 
 													<Link to={`/${item.id}`} className={classes.itemLink}>
 														<Typography variant="body1">{item.item}</Typography>
-														<Box clone mt={0.5}>
+														<Box
+															clone
+															mt={0.5}
+															color={
+																item.dataEntrega &&
+																item.dataEntrega < new Date()
+																	? 'error.main'
+																	: 'default'
+															}
+														>
 															<Typography variant="body2">
 																{item.dataEntrega &&
 																	item.dataEntrega.toLocaleDateString(
-																		'default'
+																		'default',
+																		{
+																			day: '2-digit',
+																			month: '2-digit',
+																			year: 'numeric'
+																		}
 																	)}
 															</Typography>
 														</Box>
