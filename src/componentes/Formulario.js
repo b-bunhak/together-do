@@ -98,7 +98,7 @@ const Formulario = ({
 				);
 			}}
 		>
-			{({ values }) => (
+			{({ values, resetForm }) => (
 				<>
 					<Box display="flex" justifyContent="space-between">
 						<IconButton component={Link} to="." replace>
@@ -235,7 +235,15 @@ const Formulario = ({
 								)}
 
 								{typeof cancelar === 'function' && (
-									<Button variant="contained" type="button" onClick={cancelar}>
+									<Button
+										variant="contained"
+										type="button"
+										onClick={event => {
+											cancelar(event);
+											setTemDataEntrega(Boolean(inicial.dataEntrega));
+											resetForm();
+										}}
+									>
 										Cancelar
 									</Button>
 								)}
