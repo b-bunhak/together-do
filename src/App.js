@@ -122,6 +122,18 @@ const App = ({ classes }) => {
 		}
 	}, [usuario]);
 
+	useEffect(() => {
+		if (usuario) {
+			return firebase
+				.firestore()
+				.collection('ordemTipo')
+				.doc(usuario.uid)
+				.onSnapshot(snapshot => {
+					setOrdemTipo(snapshot.get('ordemTipo'));
+				});
+		}
+	}, [usuario]);
+
 	function adicionarItem(item) {
 		const db = firebase.firestore();
 
@@ -244,6 +256,15 @@ const App = ({ classes }) => {
 		return ordemRef.set({ ordem });
 	}
 
+	function alterarOrdemTipo(ordemTipo) {
+		const ordemTipoRef = firebase
+			.firestore()
+			.collection('ordemTipo')
+			.doc(usuario.uid);
+
+		return ordemTipoRef.set({ ordemTipo });
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
@@ -284,7 +305,7 @@ const App = ({ classes }) => {
 										alterarFeito={alterarFeito}
 										alterarOrdem={alterarOrdem}
 										ordemTipo={ordemTipo}
-										setOrdemTipo={setOrdemTipo}
+										setOrdemTipo={alterarOrdemTipo}
 									/>
 								)}
 							/>
