@@ -75,9 +75,14 @@ const Feito = ({ classes, items, feito = [], alterarFeito }) => {
 							alignItems="center"
 							bgcolor="background.default"
 						>
-							<Link to={`/${item.id}`} className={classes.itemLink}>
+							<Typography
+								noWrap
+								component={Link}
+								to={`/${item.id}`}
+								className={classes.itemLink}
+							>
 								{item.item}
-							</Link>
+							</Typography>
 
 							<Checkbox
 								checked={!!item.feito}

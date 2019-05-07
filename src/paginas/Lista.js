@@ -41,10 +41,6 @@ const styles = theme => ({
 		flexDirection: 'column'
 	},
 
-	tituloDiv: {
-		display: 'flex'
-	},
-
 	lista: {
 		flex: '1',
 		paddingBottom: theme.spacing(10),
@@ -80,7 +76,28 @@ const Lista = ({
 }) => {
 	const [labelWidth, setLabelWidth] = useState(0);
 
-	const listaOrdem = ordemTipo === 'prioridade' ? ordem : naoFeito;
+	//const listaOrdem = ordemTipo === 'prioridade' ? ordem : naoFeito;
+
+	let listaOrdem = naoFeito;
+	if (ordemTipo === 'prioridade') {
+		listaOrdem = ordem;
+	}
+	if (ordemTipo === 'entrega') {
+		listaOrdem = [...naoFeito].sort((a, b) => {
+			const dataA = items.get(a).dataEntrega;
+			const dataB = items.get(b).dataEntrega;
+
+			if (!dataA && !!dataB) {
+				return 1;
+			}
+
+			if (!!dataA && !dataB) {
+				return -1;
+			}
+
+			return dataA - dataB;
+		});
+	}
 
 	return (
 		<>
@@ -122,7 +139,8 @@ const Lista = ({
 							/>
 						}
 					>
-						<MenuItem value="data">Data</MenuItem>
+						<MenuItem value="data">Data de Criação</MenuItem>
+						<MenuItem value="entrega">Data de Entrega</MenuItem>
 						<MenuItem value="prioridade">Prioridade</MenuItem>
 					</Select>
 				</FormControl>
