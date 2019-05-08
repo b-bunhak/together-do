@@ -66,14 +66,16 @@ const styles = theme => ({
 
 const Lista = ({
 	classes,
-	items,
+	items: { items = {}, naoFeito = [] },
 	ordem = [],
-	naoFeito = [],
 	alterarFeito,
 	alterarOrdem,
 	ordemTipo,
-	setOrdemTipo
+	setOrdemTipo,
+	match
 }) => {
+	//console.log(match);
+
 	const [labelWidth, setLabelWidth] = useState(0);
 
 	//const listaOrdem = ordemTipo === 'prioridade' ? ordem : naoFeito;
@@ -109,7 +111,7 @@ const Lista = ({
 
 					<Button
 						component={Link}
-						to="/feito"
+						to={`${match.url}/feito`}
 						variant="outlined"
 						className={classes.button}
 					>
@@ -189,7 +191,10 @@ const Lista = ({
 												>
 													{ordemTipo === 'prioridade' && <DragHandleIcon />}
 
-													<Link to={`/${item.id}`} className={classes.itemLink}>
+													<Link
+														to={`${match.url}/${item.id}`}
+														className={classes.itemLink}
+													>
 														<Typography noWrap component="div">
 															{item.item}
 														</Typography>
@@ -241,7 +246,7 @@ const Lista = ({
 				aria-label="Add"
 				className={classes.fab}
 				component={Link}
-				to="/novo"
+				to={`${match.url}/novo`}
 			>
 				<AddIcon />
 			</Fab>

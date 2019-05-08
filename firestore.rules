@@ -1,18 +1,21 @@
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isOwner() {
-      return request.auth.uid == resource.data.usuario;
+    function dono() {
+      return request.auth.uid == resource.data.dono;
     }
 
+    match /infoUsuario/{usuario} {
+      allow read, write: if request.auth.uid == usuario;
+    }
 
     match /items/{item} {
-      allow read: if isOwner();
+      allow read: if dono();
 
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.usuario;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.dono;
 
-      allow update: if isOwner();
+      allow update: if dono();
 
-      allow delete: if isOwner();
+      allow delete: if dono();
     }
 
     match /ordem/{usuario} {

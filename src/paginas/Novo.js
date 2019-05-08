@@ -15,7 +15,9 @@ const styles = theme => ({
 	}
 });
 
-const Novo = ({ classes, history, adicionarItem }) => {
+const Novo = ({ classes, history, adicionarItem, match }) => {
+	const parentUrl = match.url.substring(0, match.url.lastIndexOf('/'));
+
 	return (
 		<div className={classes.pagina}>
 			<Formulario
@@ -23,10 +25,10 @@ const Novo = ({ classes, history, adicionarItem }) => {
 				editar
 				submit={v => {
 					return Promise.resolve(adicionarItem(v)).then(() =>
-						history.replace('/')
+						history.replace(parentUrl)
 					);
 				}}
-				cancelar={() => history.replace('/')}
+				cancelar={() => history.replace(parentUrl)}
 			/>
 		</div>
 	);

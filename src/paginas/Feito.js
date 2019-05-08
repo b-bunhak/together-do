@@ -48,7 +48,7 @@ const styles = theme => ({
 	}
 });
 
-const Feito = ({ classes, items, feito = [], alterarFeito }) => {
+const Feito = ({ classes, items, feito = [], alterarFeito, match }) => {
 	return (
 		<div className={classes.pagina}>
 			<Box display="flex" alignItems="center" justifyContent="space-between">
@@ -56,7 +56,10 @@ const Feito = ({ classes, items, feito = [], alterarFeito }) => {
 					Feito
 				</Typography>
 
-				<IconButton component={Link} to=".">
+				<IconButton
+					component={Link}
+					to={match.url.substring(0, match.url.lastIndexOf('/'))}
+				>
 					<BackIcon />
 				</IconButton>
 			</Box>
