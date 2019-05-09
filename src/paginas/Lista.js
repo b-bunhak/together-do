@@ -66,8 +66,9 @@ const styles = theme => ({
 
 const Lista = ({
 	classes,
-	items: { items = {}, naoFeito = [] },
-	ordem = [],
+	items,
+	grupo: { naoFeito = [], ordemEntrega = [] },
+	grupoOrdem,
 	alterarFeito,
 	alterarOrdem,
 	ordemTipo,
@@ -82,24 +83,13 @@ const Lista = ({
 
 	let listaOrdem = naoFeito;
 	if (ordemTipo === 'prioridade') {
-		listaOrdem = ordem;
+		listaOrdem = grupoOrdem.ordem;
 	}
 	if (ordemTipo === 'entrega') {
-		listaOrdem = [...naoFeito].sort((a, b) => {
-			const dataA = items.get(a).dataEntrega;
-			const dataB = items.get(b).dataEntrega;
-
-			if (!dataA && !!dataB) {
-				return 1;
-			}
-
-			if (!!dataA && !dataB) {
-				return -1;
-			}
-
-			return dataA - dataB;
-		});
+		listaOrdem = ordemEntrega;
 	}
+
+	//console.log('li', listaOrdem);
 
 	return (
 		<>
@@ -150,13 +140,13 @@ const Lista = ({
 				<DragDropContext
 					onDragEnd={result => {
 						if (result.destination) {
-							ordem.splice(
+							grupoOrdem.ordem.splice(
 								result.destination.index,
 								0,
-								ordem.splice(result.source.index, 1)[0]
+								grupoOrdem.ordem.splice(result.source.index, 1)[0]
 							);
 
-							alterarOrdem(ordem);
+							alterarOrdem(grupoOrdem.ordem);
 						}
 					}}
 				>

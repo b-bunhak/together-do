@@ -48,7 +48,13 @@ const styles = theme => ({
 	}
 });
 
-const Feito = ({ classes, items, feito = [], alterarFeito, match }) => {
+const Feito = ({
+	classes,
+	items,
+	grupo: { feito = [] },
+	alterarFeito,
+	match
+}) => {
 	return (
 		<div className={classes.pagina}>
 			<Box display="flex" alignItems="center" justifyContent="space-between">

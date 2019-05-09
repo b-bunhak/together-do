@@ -91,21 +91,22 @@ const App = ({ classes }) => {
 				.onSnapshot(snapshot => {
 					const grupoIds = snapshot.get('grupos') || [];
 
-					setGrupos(grupoIds);
+					setGrupos([usuario.uid, ...grupoIds]);
 					setGruposLoading(false);
 				});
 		}
 	}, [usuario]);
 
 	// Items
-	const [items, setItems] = useState({});
+	const [items, setItems] = useState(new Map());
+	const [itemsGrupos, setItemsGrupos] = useState({});
 
 	useEffect(() => {
 		if (usuario) {
 			const unsubs = grupos.map(id => {
-				setItems({
-					...items,
-					[id]: { ...items[id], loading: true }
+				setItemsGrupos({
+					...itemsGrupos,
+					[id]: { ...itemsGrupos[id], loading: true }
 				});
 
 				return firebase
@@ -114,48 +115,65 @@ const App = ({ classes }) => {
 					.where('dono', '==', id)
 					.orderBy('criadoData')
 					.onSnapshot(snapshot => {
-						const items = new Map();
+						setItems(items => {
+							const novoItems = new Map(items);
 
-						snapshot.forEach(doc => {
-							items.set(doc.id, {
-								...doc.data(),
-								criadoData:
-									doc.get('criadoData') && doc.get('criadoData').toDate(),
-								dataEntrega:
-									doc.get('dataEntrega') && doc.get('dataEntrega').toDate(),
-								feito: doc.get('feito') && doc.get('feito').toDate()
+							snapshot.docChanges().forEach(({ type, doc }) => {
+								if (type === 'removed') {
+									novoItems.delete(doc.id);
+								} else {
+									novoItems.set(doc.id, {
+										...doc.data(),
+										criadoData:
+											doc.get('criadoData') && doc.get('criadoData').toDate(),
+										dataEntrega:
+											doc.get('dataEntrega') && doc.get('dataEntrega').toDate(),
+										feito: doc.get('feito') && doc.get('feito').toDate()
+									});
+								}
 							});
-						});
 
-						const [naoFeito, feito] = partition(
-							[...items.values()]
-								.sort((item1, item2) => item2.dataCriado - item1.dataCriado)
-								.map(item => item.id),
-							itemId => !items.get(itemId).feito
-						);
+							const grupoItemIds = snapshot.docs.map(doc => doc.id);
 
-						feito.sort(
-							(item1, item2) => items.get(item2).feito - items.get(item1).feito
-						);
+							const [naoFeito, feito] = partition(
+								grupoItemIds
+									.map(id => novoItems.get(id))
+									.sort((item1, item2) => item2.dataCriado - item1.dataCriado)
+									.map(item => item.id),
+								itemId => !novoItems.get(itemId).feito
+							);
 
-						const ordemEntrega = [...naoFeito].sort((a, b) => {
-							const dataA = items.get(a).dataEntrega;
-							const dataB = items.get(b).dataEntrega;
+							feito.sort(
+								(item1, item2) =>
+									novoItems.get(item2).feito - novoItems.get(item1).feito
+							);
 
-							if (!dataA && !!dataB) {
-								return 1;
-							}
+							const ordemEntrega = [...naoFeito].sort((a, b) => {
+								const dataA = novoItems.get(a).dataEntrega;
+								const dataB = novoItems.get(b).dataEntrega;
 
-							if (!!dataA && !dataB) {
-								return -1;
-							}
+								if (!dataA && !!dataB) {
+									return 1;
+								}
 
-							return dataA - dataB;
-						});
+								if (!!dataA && !dataB) {
+									return -1;
+								}
 
-						setItems({
-							...items,
-							[id]: { loading: false, items, naoFeito, feito, ordemEntrega }
+								return dataA - dataB;
+							});
+
+							setItemsGrupos(itemsGrupos => ({
+								...itemsGrupos,
+								[id]: {
+									loading: false,
+									ids: grupoItemIds,
+									naoFeito,
+									feito,
+									ordemEntrega
+								}
+							}));
+							return novoItems;
 						});
 					});
 			});
@@ -165,16 +183,16 @@ const App = ({ classes }) => {
 	}, [usuario, grupos]);
 
 	// Ordem
-	const [ordem, setOrdem] = useState({});
+	const [grupoOrdem, setGrupoOrdem] = useState({});
 
 	useEffect(() => {
 		if (usuario) {
 			const ids = [usuario.uid, ...grupos];
 
 			const unSubs = ids.map(id => {
-				setOrdem({
-					...ordem,
-					[id]: { ...ordem[id], loading: true }
+				setGrupoOrdem({
+					...grupoOrdem,
+					[id]: { ...grupoOrdem[id], loading: true }
 				});
 
 				return firebase
@@ -182,8 +200,8 @@ const App = ({ classes }) => {
 					.collection('ordem')
 					.doc(id)
 					.onSnapshot(snapshot => {
-						setOrdem({
-							...ordem,
+						setGrupoOrdem({
+							...grupoOrdem,
 							[id]: { loading: false, ordem: snapshot.get('ordem') }
 						});
 					});
@@ -294,7 +312,7 @@ const App = ({ classes }) => {
 				const ordemRef = firebase
 					.firestore()
 					.collection('ordem')
-					.doc(usuario.uid);
+					.doc(item.dono);
 
 				const feito =
 					status === undefined
@@ -315,8 +333,10 @@ const App = ({ classes }) => {
 
 				batch.set(ordemRef, {
 					ordem: feito
-						? ordem.filter(itemId => itemId !== itemRef.id)
-						: [...ordem, itemRef.id]
+						? grupoOrdem[item.dono].ordem.filter(
+								itemId => itemId !== itemRef.id
+						  )
+						: [...grupoOrdem[item.dono].ordem, itemRef.id]
 				});
 
 				return batch.commit();
@@ -343,7 +363,8 @@ const App = ({ classes }) => {
 	}
 
 	console.log(items);
-	console.log(ordem);
+	console.log(itemsGrupos);
+	console.log(grupoOrdem);
 
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -417,32 +438,32 @@ const App = ({ classes }) => {
 							<Route
 								exact
 								path="/"
-								render={({ match }) => {
+								render={() => {
 									return <Redirect to="/meu" />;
 								}}
 							/>
 
 							<Route
-								path="/:grupoId"
-								render={({ match }) => {
-									console.log(match.params.grupoId);
-									console.log(
-										match.params.grupoId &&
-											grupos.includes(match.params.grupoId)
-									);
+								path="/:id"
+								render={({
+									match: {
+										url,
+										params: { id }
+									}
+								}) => {
+									const grupoId = id === 'meu' ? usuario.uid : id;
 
-									console.log(usuario.uid);
-
-									return (
+									return grupoId && grupos.includes(grupoId) ? (
 										<Switch>
 											<Route
 												exact
-												path={match.url}
+												path={url}
 												render={routeProps => (
 													<Lista
 														{...routeProps}
-														items={items[usuario.uid]}
-														ordem={ordem}
+														items={items}
+														grupo={itemsGrupos[grupoId]}
+														grupoOrdem={grupoOrdem}
 														alterarFeito={alterarFeito}
 														alterarOrdem={alterarOrdem}
 														ordemTipo={ordemTipo}
@@ -453,11 +474,12 @@ const App = ({ classes }) => {
 
 											<Route
 												exact
-												path={`${match.url}/feito`}
+												path={`${url}/feito`}
 												render={routeProps => (
 													<Feito
 														{...routeProps}
 														items={items}
+														grupo={itemsGrupos[grupoId]}
 														alterarFeito={alterarFeito}
 													/>
 												)}
@@ -465,7 +487,7 @@ const App = ({ classes }) => {
 
 											<Route
 												exact
-												path={`${match.url}/novo`}
+												path={`${url}/novo`}
 												render={routeProps => (
 													<Novo {...routeProps} adicionarItem={adicionarItem} />
 												)}
@@ -473,7 +495,7 @@ const App = ({ classes }) => {
 
 											<Route
 												exact
-												path={`${match.url}/:id`}
+												path={`${url}/:id`}
 												render={routeProps => {
 													const {
 														match: {
@@ -485,7 +507,7 @@ const App = ({ classes }) => {
 														return (
 															<Visualizar
 																{...routeProps}
-																inicial={items.get(id)}
+																inicial={items[grupoId].items.get(id)}
 																//editarItem={editarItem}
 																// deletarItem={() => {
 																// 	deletarItem(id);
@@ -499,6 +521,8 @@ const App = ({ classes }) => {
 												}}
 											/>
 										</Switch>
+									) : (
+										<Redirect to="/" />
 									);
 								}}
 							/>
