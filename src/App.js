@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -25,7 +25,6 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
@@ -78,7 +77,6 @@ const App = ({ classes }) => {
 	// Usuario Info
 	const [gruposLoading, setGruposLoading] = useState(true);
 	const [grupos, setGrupos] = useState([]);
-	const [grupoSelecionado, setGrupoSelecionado] = useState(null);
 
 	useEffect(() => {
 		if (usuario) {
@@ -104,10 +102,10 @@ const App = ({ classes }) => {
 	useEffect(() => {
 		if (usuario) {
 			const unsubs = grupos.map(id => {
-				setItemsGrupos({
+				setItemsGrupos(itemsGrupos => ({
 					...itemsGrupos,
 					[id]: { ...itemsGrupos[id], loading: true }
-				});
+				}));
 
 				return firebase
 					.firestore()
@@ -187,23 +185,21 @@ const App = ({ classes }) => {
 
 	useEffect(() => {
 		if (usuario) {
-			const ids = [usuario.uid, ...grupos];
-
-			const unSubs = ids.map(id => {
-				setGrupoOrdem({
+			const unSubs = grupos.map(id => {
+				setGrupoOrdem(grupoOrdem => ({
 					...grupoOrdem,
 					[id]: { ...grupoOrdem[id], loading: true }
-				});
+				}));
 
 				return firebase
 					.firestore()
 					.collection('ordem')
 					.doc(id)
 					.onSnapshot(snapshot => {
-						setGrupoOrdem({
+						setGrupoOrdem(grupoOrdem => ({
 							...grupoOrdem,
 							[id]: { loading: false, ordem: snapshot.get('ordem') }
-						});
+						}));
 					});
 			});
 
@@ -227,7 +223,7 @@ const App = ({ classes }) => {
 		}
 	}, [usuario]);
 
-	//
+	/////////////
 
 	function adicionarItem(item, grupo = usuario.uid) {
 		const db = firebase.firestore();
@@ -247,7 +243,7 @@ const App = ({ classes }) => {
 
 				let ordem;
 				if (!ordemDoc.exists || !Array.isArray(ordemDoc.get('ordem'))) {
-					ordem = [...items[grupo].itemsFeito];
+					ordem = [...itemsGrupos[grupo].feito];
 				} else {
 					ordem = ordemDoc.get('ordem');
 				}
@@ -259,43 +255,45 @@ const App = ({ classes }) => {
 		);
 	}
 
-	// function editarItem(item) {
-	// 	if (item.id && items.has(item.id)) {
-	// 		const itemDoc = firebase
-	// 			.firestore()
-	// 			.collection('items')
-	// 			.doc(item.id);
+	function editarItem(item) {
+		if (item.id && items.has(item.id)) {
+			const itemDoc = firebase
+				.firestore()
+				.collection('items')
+				.doc(item.id);
 
-	// 		return itemDoc.set({ ...item, id: itemDoc.id }, { merge: true });
-	// 	}
-	// }
+			return itemDoc.set({ ...item, id: itemDoc.id }, { merge: true });
+		}
+	}
 
-	// function deletarItem(id) {
-	// 	if (id && items.has(id)) {
-	// 		const db = firebase.firestore();
+	function deletarItem(id) {
+		if (id && items.has(id)) {
+			const db = firebase.firestore();
 
-	// 		const ordemRef = db.collection('ordem').doc(usuario.uid);
+			const ordemRef = db.collection('ordem').doc(usuario.uid);
 
-	// 		return db.runTransaction(transaction =>
-	// 			transaction.get(ordemRef).then(ordemDoc => {
-	// 				const itemRef = db.collection('items').doc(id);
+			return db.runTransaction(transaction =>
+				transaction.get(ordemRef).then(ordemDoc => {
+					const itemRef = db.collection('items').doc(id);
 
-	// 				transaction.delete(itemRef);
+					transaction.delete(itemRef);
 
-	// 				let ordem;
-	// 				if (!ordemDoc.exists || !Array.isArray(ordemDoc.get('ordem'))) {
-	// 					ordem = [...itemsFeito].filter(item => item !== id);
-	// 				} else {
-	// 					ordem = ordemDoc.get('ordem');
-	// 				}
+					let ordem;
+					if (!ordemDoc.exists || !Array.isArray(ordemDoc.get('ordem'))) {
+						ordem = [...items[items.get(id).dono].itemsFeito].filter(
+							item => item !== id
+						);
+					} else {
+						ordem = ordemDoc.get('ordem');
+					}
 
-	// 				ordem = ordem.filter(ordemId => ordemId !== id);
+					ordem = ordem.filter(ordemId => ordemId !== id);
 
-	// 				transaction.set(ordemRef, { ordem });
-	// 			})
-	// 		);
-	// 	}
-	// }
+					transaction.set(ordemRef, { ordem });
+				})
+			);
+		}
+	}
 
 	function alterarFeito(id, status) {
 		const item = items.get(id);
@@ -361,10 +359,6 @@ const App = ({ classes }) => {
 
 		return ordemTipoRef.set({ ordemTipo });
 	}
-
-	console.log(items);
-	console.log(itemsGrupos);
-	console.log(grupoOrdem);
 
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -463,7 +457,7 @@ const App = ({ classes }) => {
 														{...routeProps}
 														items={items}
 														grupo={itemsGrupos[grupoId]}
-														grupoOrdem={grupoOrdem}
+														grupoOrdem={grupoOrdem[grupoId]}
 														alterarFeito={alterarFeito}
 														alterarOrdem={alterarOrdem}
 														ordemTipo={ordemTipo}
@@ -508,10 +502,10 @@ const App = ({ classes }) => {
 															<Visualizar
 																{...routeProps}
 																inicial={items.get(id)}
-																//editarItem={editarItem}
-																// deletarItem={() => {
-																// 	deletarItem(id);
-																// }}
+																editarItem={editarItem}
+																deletarItem={() => {
+																	deletarItem(id);
+																}}
 																alterarFeito={alterarFeito}
 															/>
 														);

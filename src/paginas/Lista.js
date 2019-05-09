@@ -75,21 +75,15 @@ const Lista = ({
 	setOrdemTipo,
 	match
 }) => {
-	//console.log(match);
-
 	const [labelWidth, setLabelWidth] = useState(0);
-
-	//const listaOrdem = ordemTipo === 'prioridade' ? ordem : naoFeito;
 
 	let listaOrdem = naoFeito;
 	if (ordemTipo === 'prioridade') {
-		listaOrdem = grupoOrdem.ordem;
+		listaOrdem = grupoOrdem.ordem || [];
 	}
 	if (ordemTipo === 'entrega') {
 		listaOrdem = ordemEntrega;
 	}
-
-	console.log('li', listaOrdem);
 
 	return (
 		<>

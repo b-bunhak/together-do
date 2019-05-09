@@ -243,7 +243,9 @@ const Formulario = ({
 										type="button"
 										onClick={event => {
 											cancelar(event);
-											setTemDataEntrega(Boolean(inicial.dataEntrega));
+											setTemDataEntrega(
+												Boolean(inicial && inicial.dataEntrega)
+											);
 											resetForm();
 										}}
 									>
