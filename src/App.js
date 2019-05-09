@@ -507,7 +507,7 @@ const App = ({ classes }) => {
 														return (
 															<Visualizar
 																{...routeProps}
-																inicial={items[grupoId].items.get(id)}
+																inicial={items.get(id)}
 																//editarItem={editarItem}
 																// deletarItem={() => {
 																// 	deletarItem(id);

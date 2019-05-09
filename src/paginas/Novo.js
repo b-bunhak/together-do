@@ -29,6 +29,7 @@ const Novo = ({ classes, history, adicionarItem, match }) => {
 					);
 				}}
 				cancelar={() => history.replace(parentUrl)}
+				voltarLink={parentUrl}
 			/>
 		</div>
 	);

@@ -89,7 +89,7 @@ const Lista = ({
 		listaOrdem = ordemEntrega;
 	}
 
-	//console.log('li', listaOrdem);
+	console.log('li', listaOrdem);
 
 	return (
 		<>

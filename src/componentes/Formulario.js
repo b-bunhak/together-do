@@ -76,7 +76,8 @@ const Formulario = ({
 	deletar,
 	editar = false,
 	alterarFeito,
-	novo = false
+	novo = false,
+	voltarLink = '.'
 }) => {
 	const [temDataEntrega, setTemDataEntrega] = useState(
 		Boolean(inicial && inicial.dataEntrega)
@@ -101,7 +102,7 @@ const Formulario = ({
 			{({ values, resetForm }) => (
 				<>
 					<Box display="flex" justifyContent="space-between">
-						<IconButton component={Link} to="." replace>
+						<IconButton component={Link} to={voltarLink} replace>
 							<BackIcon />
 						</IconButton>
 

@@ -19,6 +19,7 @@ const Visualizar = ({
 	classes,
 	history,
 	location,
+	match,
 	inicial,
 	editarItem,
 	deletarItem,
@@ -36,12 +37,13 @@ const Visualizar = ({
 				inicial={inicial}
 				submit={v => {
 					return Promise.resolve(editarItem(v)).then(() =>
-						history.replace(location.pathname)
+						history.replace(match.url)
 					);
 				}}
-				cancelar={() => history.replace(location.pathname)}
+				cancelar={() => history.replace(match.url)}
 				deletar={deletarItem}
 				alterarFeito={alterarFeito}
+				voltarLink={match.url.substring(0, match.url.lastIndexOf('/'))}
 			/>
 		</div>
 	);
