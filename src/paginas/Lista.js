@@ -22,6 +22,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
+import FlipMove from 'react-flip-move';
+
 import Box from '@material-ui/core/Box';
 
 const styles = theme => ({
@@ -151,74 +153,76 @@ const Lista = ({
 								innerRef={provided.innerRef}
 								className={classes.lista}
 							>
-								{listaOrdem.map((itemId, index) => {
-									const item = items.get(itemId);
+								<FlipMove>
+									{listaOrdem.map((itemId, index) => {
+										const item = items.get(itemId);
 
-									return (
-										<Draggable
-											key={item.id}
-											draggableId={item.id}
-											index={index}
-											isDragDisabled={ordemTipo !== 'prioridade'}
-										>
-											{provided => (
-												<Box
-													ref={provided.innerRef}
-													{...provided.draggableProps}
-													{...provided.dragHandleProps}
-													borderBottom={1}
-													borderColor="divider"
-													display="flex"
-													component="li"
-													alignItems="center"
-													bgcolor="background.default"
-												>
-													{ordemTipo === 'prioridade' && <DragHandleIcon />}
-
-													<Link
-														to={`${match.url}/${item.id}`}
-														className={classes.itemLink}
+										return (
+											<Draggable
+												key={item.id}
+												draggableId={item.id}
+												index={index}
+												isDragDisabled={ordemTipo !== 'prioridade'}
+											>
+												{provided => (
+													<Box
+														ref={provided.innerRef}
+														{...provided.draggableProps}
+														{...provided.dragHandleProps}
+														borderBottom={1}
+														borderColor="divider"
+														display="flex"
+														component="li"
+														alignItems="center"
+														bgcolor="background.default"
 													>
-														<Typography noWrap component="div">
-															{item.item}
-														</Typography>
-														<Box
-															clone
-															mt={0.5}
-															color={
-																item.dataEntrega &&
-																item.dataEntrega < new Date()
-																	? 'error.main'
-																	: 'default'
-															}
+														{ordemTipo === 'prioridade' && <DragHandleIcon />}
+
+														<Link
+															to={`${match.url}/${item.id}`}
+															className={classes.itemLink}
 														>
-															<Typography variant="body2">
-																{item.dataEntrega &&
-																	item.dataEntrega.toLocaleDateString(
-																		'default',
-																		{
-																			day: '2-digit',
-																			month: '2-digit',
-																			year: 'numeric'
-																		}
-																	)}
+															<Typography noWrap component="div">
+																{item.item}
 															</Typography>
-														</Box>
-													</Link>
+															<Box
+																clone
+																mt={0.5}
+																color={
+																	item.dataEntrega &&
+																	item.dataEntrega < new Date()
+																		? 'error.main'
+																		: 'default'
+																}
+															>
+																<Typography variant="body2">
+																	{item.dataEntrega &&
+																		item.dataEntrega.toLocaleDateString(
+																			'default',
+																			{
+																				day: '2-digit',
+																				month: '2-digit',
+																				year: 'numeric'
+																			}
+																		)}
+																</Typography>
+															</Box>
+														</Link>
 
-													<Checkbox
-														checked={!!item.feito}
-														onChange={e =>
-															alterarFeito(item.id, e.target.checked)
-														}
-													/>
-												</Box>
-											)}
-										</Draggable>
-									);
-								})}
+														<Checkbox
+															checked={!!item.feito}
+															onChange={e =>
+																alterarFeito(item.id, e.target.checked)
+															}
+														/>
+													</Box>
+												)}
+											</Draggable>
+										);
+									})}
 
-								{provided.placeholder}
+									{provided.placeholder}
+								</FlipMove>
 							</List>
 						)}
 					</Droppable>
