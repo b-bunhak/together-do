@@ -14,7 +14,7 @@ import DateFnsUtils from '@date-io/date-fns';
 //import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
-import { partition } from 'lodash';
+import { partition, isEqual } from 'lodash';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,15 +23,10 @@ import Button from '@material-ui/core/Button';
 import ArrowRightIcon from '@material-ui/icons/MoreVert';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
 
 import Box from '@material-ui/core/Box';
 
+import GruposModal from './componentes/GruposModal';
 import Login from './paginas/Login';
 import Lista from './paginas/Lista';
 import Feito from './paginas/Feito';
@@ -48,7 +43,7 @@ const config = {
 };
 firebase.initializeApp(config);
 
-const styles = {
+const styles = theme => ({
 	sairBotao: {
 		marginLeft: 'auto'
 	},
@@ -59,8 +54,11 @@ const styles = {
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center'
+	},
+	espacoDialog: {
+		margin: theme.spacing(2)
 	}
-};
+});
 
 const App = ({ classes }) => {
 	// Usuario
@@ -74,9 +72,10 @@ const App = ({ classes }) => {
 		});
 	}, []);
 
-	// Usuario Info
+	// Grupos
 	const [gruposLoading, setGruposLoading] = useState(true);
 	const [grupos, setGrupos] = useState([]);
+	const [gruposInfo, setGruposInfo] = useState({});
 
 	useEffect(() => {
 		if (usuario) {
@@ -84,12 +83,30 @@ const App = ({ classes }) => {
 
 			return firebase
 				.firestore()
-				.collection('infoUsuario')
-				.doc(usuario.uid)
+				.collection('grupos')
+				.where('membros', 'array-contains', usuario.uid)
 				.onSnapshot(snapshot => {
-					const grupoIds = snapshot.get('grupos') || [];
+					const gruposInfo = {
+						[usuario.uid]: {
+							id: usuario.uid,
+							nome: 'Meu'
+						}
+					};
+					const gruposIds = [usuario.uid];
 
-					setGrupos([usuario.uid, ...grupoIds]);
+					snapshot.forEach(doc => {
+						gruposInfo[doc.id] = doc.data();
+
+						gruposIds.push(doc.id);
+					});
+
+					gruposIds.sort();
+
+					if (!isEqual(grupos, gruposIds)) {
+						setGrupos(gruposIds);
+					}
+
+					setGruposInfo(gruposInfo);
 					setGruposLoading(false);
 				});
 		}
@@ -222,6 +239,9 @@ const App = ({ classes }) => {
 				});
 		}
 	}, [usuario]);
+
+	// Grupos Modal
+	const [gruposModalVisivel, setGruposModalVisivel] = useState(false);
 
 	/////////////
 
@@ -373,25 +393,13 @@ const App = ({ classes }) => {
 					<Login />
 				) : (
 					<>
-						<Dialog
-							open={false}
-							//onClose={handleClose}
-						>
-							<DialogTitle id="simple-dialog-title">Espacos</DialogTitle>
-							<DialogContent>
-								<List>
-									{grupos.map(id => (
-										<ListItem button key={id}>
-											<ListItemText primary={id} />
-										</ListItem>
-									))}
+						<GruposModal
+							grupos={grupos}
+							gruposInfo={gruposInfo}
+							open={gruposModalVisivel}
+							onClose={() => setGruposModalVisivel(false)}
+						/>
 
-									<ListItem button>
-										<ListItemText primary="add account" />
-									</ListItem>
-								</List>
-							</DialogContent>
-						</Dialog>
 						<AppBar position="static">
 							<Toolbar>
 								<Box
@@ -409,6 +417,7 @@ const App = ({ classes }) => {
 											borderTopRightRadius: 0,
 											borderBottomRightRadius: 0
 										}}
+										onClick={() => setGruposModalVisivel(true)}
 									>
 										<ArrowRightIcon />
 
