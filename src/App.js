@@ -15,7 +15,7 @@ import DateFnsUtils from '@date-io/date-fns';
 //import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
-import { partition, isEqual } from 'lodash';
+import { partition, isEqual, sortBy } from 'lodash';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -95,15 +95,14 @@ const App = ({ classes }) => {
 							nome: 'Meu'
 						}
 					};
-					const gruposIds = [usuario.uid];
 
 					snapshot.forEach(doc => {
 						gruposInfo[doc.id] = doc.data();
-
-						gruposIds.push(doc.id);
 					});
 
-					gruposIds.sort();
+					const gruposIds = sortBy(gruposInfo, grupo =>
+						grupo.nome.toLowerCase()
+					).map(grupo => grupo.id);
 
 					ReactDOM.unstable_batchedUpdates(() => {
 						setGruposInfo(gruposInfo);
@@ -454,6 +453,7 @@ const App = ({ classes }) => {
 								return (
 									<>
 										<GruposModal
+											grupoAtual={grupoId}
 											grupos={grupos}
 											gruposInfo={gruposInfo}
 											criarGrupo={criarGrupo}
