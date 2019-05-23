@@ -102,11 +102,12 @@ const App = ({ classes }) => {
 
 					gruposIds.sort();
 
+					setGruposInfo(gruposInfo);
+
 					if (!isEqual(grupos, gruposIds)) {
 						setGrupos(gruposIds);
 					}
 
-					setGruposInfo(gruposInfo);
 					setGruposLoading(false);
 				});
 		}
@@ -118,82 +119,92 @@ const App = ({ classes }) => {
 
 	useEffect(() => {
 		if (usuario) {
-			const unsubs = grupos.map(id => {
-				setItemsGrupos(itemsGrupos => ({
-					...itemsGrupos,
-					[id]: { ...itemsGrupos[id], loading: true }
-				}));
+			let unsubs = [];
 
-				return firebase
-					.firestore()
-					.collection('items')
-					.where('dono', '==', id)
-					.orderBy('criadoData')
-					.onSnapshot(snapshot => {
-						setItems(items => {
-							const novoItems = new Map(items);
+			// Timeout por causa de um bug com firebase
+			// Acontece quando faz um sub muito rapido depois de um unSub
+			const timeout = setTimeout(() => {
+				unsubs = grupos.map(id => {
+					setItemsGrupos(itemsGrupos => ({
+						...itemsGrupos,
+						[id]: { ...itemsGrupos[id], loading: true }
+					}));
 
-							snapshot.docChanges().forEach(({ type, doc }) => {
-								if (type === 'removed') {
-									novoItems.delete(doc.id);
-								} else {
-									novoItems.set(doc.id, {
-										...doc.data(),
-										criadoData:
-											doc.get('criadoData') && doc.get('criadoData').toDate(),
-										dataEntrega:
-											doc.get('dataEntrega') && doc.get('dataEntrega').toDate(),
-										feito: doc.get('feito') && doc.get('feito').toDate()
-									});
-								}
+					return firebase
+						.firestore()
+						.collection('items')
+						.where('dono', '==', id)
+						.orderBy('criadoData')
+						.onSnapshot(snapshot => {
+							setItems(items => {
+								const novoItems = new Map(items);
+
+								snapshot.docChanges().forEach(({ type, doc }) => {
+									if (type === 'removed') {
+										novoItems.delete(doc.id);
+									} else {
+										novoItems.set(doc.id, {
+											...doc.data(),
+											criadoData:
+												doc.get('criadoData') && doc.get('criadoData').toDate(),
+											dataEntrega:
+												doc.get('dataEntrega') &&
+												doc.get('dataEntrega').toDate(),
+											feito: doc.get('feito') && doc.get('feito').toDate()
+										});
+									}
+								});
+
+								const grupoItemIds = snapshot.docs.map(doc => doc.id);
+
+								const [naoFeito, feito] = partition(
+									grupoItemIds
+										.map(id => novoItems.get(id))
+										.sort((item1, item2) => item2.dataCriado - item1.dataCriado)
+										.map(item => item.id),
+									itemId => !novoItems.get(itemId).feito
+								);
+
+								feito.sort(
+									(item1, item2) =>
+										novoItems.get(item2).feito - novoItems.get(item1).feito
+								);
+
+								const ordemEntrega = [...naoFeito].sort((a, b) => {
+									const dataA = novoItems.get(a).dataEntrega;
+									const dataB = novoItems.get(b).dataEntrega;
+
+									if (!dataA && !!dataB) {
+										return 1;
+									}
+
+									if (!!dataA && !dataB) {
+										return -1;
+									}
+
+									return dataA - dataB;
+								});
+
+								setItemsGrupos(itemsGrupos => ({
+									...itemsGrupos,
+									[id]: {
+										loading: false,
+										ids: grupoItemIds,
+										naoFeito,
+										feito,
+										ordemEntrega
+									}
+								}));
+								return novoItems;
 							});
-
-							const grupoItemIds = snapshot.docs.map(doc => doc.id);
-
-							const [naoFeito, feito] = partition(
-								grupoItemIds
-									.map(id => novoItems.get(id))
-									.sort((item1, item2) => item2.dataCriado - item1.dataCriado)
-									.map(item => item.id),
-								itemId => !novoItems.get(itemId).feito
-							);
-
-							feito.sort(
-								(item1, item2) =>
-									novoItems.get(item2).feito - novoItems.get(item1).feito
-							);
-
-							const ordemEntrega = [...naoFeito].sort((a, b) => {
-								const dataA = novoItems.get(a).dataEntrega;
-								const dataB = novoItems.get(b).dataEntrega;
-
-								if (!dataA && !!dataB) {
-									return 1;
-								}
-
-								if (!!dataA && !dataB) {
-									return -1;
-								}
-
-								return dataA - dataB;
-							});
-
-							setItemsGrupos(itemsGrupos => ({
-								...itemsGrupos,
-								[id]: {
-									loading: false,
-									ids: grupoItemIds,
-									naoFeito,
-									feito,
-									ordemEntrega
-								}
-							}));
-							return novoItems;
 						});
-					});
-			});
+				});
+			}, 250);
 
-			return () => unsubs.forEach(unSub => unSub());
+			return () => {
+				clearTimeout(timeout);
+				unsubs.forEach(unSub => unSub());
+			};
 		}
 	}, [usuario, grupos]);
 
@@ -202,25 +213,34 @@ const App = ({ classes }) => {
 
 	useEffect(() => {
 		if (usuario) {
-			const unSubs = grupos.map(id => {
-				setGrupoOrdem(grupoOrdem => ({
-					...grupoOrdem,
-					[id]: { ...grupoOrdem[id], loading: true }
-				}));
+			let unSubs = [];
 
-				return firebase
-					.firestore()
-					.collection('ordem')
-					.doc(id)
-					.onSnapshot(snapshot => {
-						setGrupoOrdem(grupoOrdem => ({
-							...grupoOrdem,
-							[id]: { loading: false, ordem: snapshot.get('ordem') }
-						}));
-					});
-			});
+			// Timeout por causa de um bug com firebase
+			// Acontece quando faz um sub muito rapido depois de um unSub
+			const timeout = setTimeout(() => {
+				unSubs = grupos.map(id => {
+					setGrupoOrdem(grupoOrdem => ({
+						...grupoOrdem,
+						[id]: { ...grupoOrdem[id], loading: true }
+					}));
 
-			return () => unSubs.forEach(unSub => unSub());
+					return firebase
+						.firestore()
+						.collection('ordem')
+						.doc(id)
+						.onSnapshot(snapshot => {
+							setGrupoOrdem(grupoOrdem => ({
+								...grupoOrdem,
+								[id]: { loading: false, ordem: snapshot.get('ordem') }
+							}));
+						});
+				});
+			}, 250);
+
+			return () => {
+				clearImmediate(timeout);
+				unSubs.forEach(unSub => unSub());
+			};
 		}
 	}, [usuario, grupos]);
 
@@ -380,6 +400,20 @@ const App = ({ classes }) => {
 		return ordemTipoRef.set({ ordemTipo });
 	}
 
+	function criarGrupo(nome) {
+		const gruposRef = firebase
+			.firestore()
+			.collection('grupos')
+			.doc();
+
+		return gruposRef.set({
+			id: gruposRef.id,
+			nome,
+			membros: [usuario.uid],
+			admins: [usuario.uid]
+		});
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
@@ -396,6 +430,7 @@ const App = ({ classes }) => {
 						<GruposModal
 							grupos={grupos}
 							gruposInfo={gruposInfo}
+							criarGrupo={criarGrupo}
 							open={gruposModalVisivel}
 							onClose={() => setGruposModalVisivel(false)}
 						/>

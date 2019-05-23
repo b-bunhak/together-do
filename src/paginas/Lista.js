@@ -69,7 +69,7 @@ const styles = theme => ({
 const Lista = ({
 	classes,
 	items,
-	grupo: { naoFeito = [], ordemEntrega = [] },
+	grupo: { naoFeito = [], ordemEntrega = [] } = {},
 	grupoOrdem,
 	alterarFeito,
 	alterarOrdem,

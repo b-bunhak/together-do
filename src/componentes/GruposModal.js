@@ -36,7 +36,14 @@ const useStyles = makeStyles(theme => ({
 	espacoDialog: { margin: theme.spacing(2) }
 }));
 
-const GruposModal = ({ grupos, gruposInfo, open, onClose, ...props }) => {
+const GruposModal = ({
+	grupos,
+	gruposInfo,
+	criarGrupo,
+	open,
+	onClose,
+	...props
+}) => {
 	const [novoFormVisivel, setNovoFormVisivel] = useState(false);
 
 	const classes = useStyles();
@@ -53,7 +60,7 @@ const GruposModal = ({ grupos, gruposInfo, open, onClose, ...props }) => {
 				initialValues={FormInicial}
 				validationSchema={schema}
 				onSubmit={values => {
-					console.log(values);
+					return criarGrupo(values.nome).then(() => setNovoFormVisivel(false));
 				}}
 			>
 				{() => (
