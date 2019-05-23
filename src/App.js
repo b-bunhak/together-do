@@ -439,50 +439,68 @@ const App = ({ classes }) => {
 					<Login />
 				) : (
 					<>
-						<GruposModal
-							grupos={grupos}
-							gruposInfo={gruposInfo}
-							criarGrupo={criarGrupo}
-							open={gruposModalVisivel}
-							onClose={() => setGruposModalVisivel(false)}
-						/>
+						<Route path="/:id">
+							{({ match }) => {
+								let grupoId = null;
 
-						<AppBar position="static">
-							<Toolbar>
-								<Box
-									clone
-									pr={1}
-									m={1}
-									borderRadius="borderRadius"
-									border={1}
-									borderRight={0}
-									borderColor="inherit"
-								>
-									<ButtonBase
-										color="inherit"
-										style={{
-											borderTopRightRadius: 0,
-											borderBottomRightRadius: 0
-										}}
-										onClick={() => setGruposModalVisivel(true)}
-									>
-										<ArrowRightIcon />
+								if (match) {
+									const {
+										params: { id }
+									} = match;
 
-										<Typography variant="h6" component="div">
-											Meu
-										</Typography>
-									</ButtonBase>
-								</Box>
+									grupoId = id === 'meu' ? usuario.uid : id;
+								}
 
-								<Button
-									color="inherit"
-									className={classes.sairBotao}
-									onClick={() => firebase.auth().signOut()}
-								>
-									Sair
-								</Button>
-							</Toolbar>
-						</AppBar>
+								return (
+									<>
+										<GruposModal
+											grupos={grupos}
+											gruposInfo={gruposInfo}
+											criarGrupo={criarGrupo}
+											open={gruposModalVisivel}
+											onClose={() => setGruposModalVisivel(false)}
+										/>
+
+										<AppBar position="static">
+											<Toolbar>
+												<Box
+													clone
+													pr={1}
+													m={1}
+													borderRadius="borderRadius"
+													border={1}
+													borderRight={0}
+													borderColor="inherit"
+												>
+													<ButtonBase
+														color="inherit"
+														style={{
+															borderTopRightRadius: 0,
+															borderBottomRightRadius: 0
+														}}
+														onClick={() => setGruposModalVisivel(true)}
+													>
+														<ArrowRightIcon />
+
+														<Typography variant="h6" component="div">
+															{grupoId && gruposInfo[grupoId].nome}
+														</Typography>
+													</ButtonBase>
+												</Box>
+
+												<Button
+													color="inherit"
+													className={classes.sairBotao}
+													onClick={() => firebase.auth().signOut()}
+												>
+													Sair
+												</Button>
+											</Toolbar>
+										</AppBar>
+									</>
+								);
+							}}
+						</Route>
 
 						<Switch>
 							<Route
