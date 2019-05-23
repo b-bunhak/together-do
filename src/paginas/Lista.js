@@ -70,7 +70,7 @@ const Lista = ({
 	classes,
 	items,
 	grupo: { naoFeito = [], ordemEntrega = [] } = {},
-	grupoOrdem,
+	grupoOrdem = {},
 	alterarFeito,
 	alterarOrdem,
 	ordemTipo,

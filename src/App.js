@@ -394,11 +394,11 @@ const App = ({ classes }) => {
 		}
 	}
 
-	function alterarOrdem(ordem) {
+	function alterarOrdem(ordem, grupo = usuario.uid) {
 		const ordemRef = firebase
 			.firestore()
 			.collection('ordem')
-			.doc(usuario.uid);
+			.doc(grupo);
 
 		return ordemRef.set({ ordem });
 	}
@@ -515,7 +515,7 @@ const App = ({ classes }) => {
 														grupo={itemsGrupos[grupoId]}
 														grupoOrdem={grupoOrdem[grupoId]}
 														alterarFeito={alterarFeito}
-														alterarOrdem={alterarOrdem}
+														alterarOrdem={ordem => alterarOrdem(ordem, grupoId)}
 														ordemTipo={ordemTipo}
 														setOrdemTipo={alterarOrdemTipo}
 													/>
