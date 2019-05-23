@@ -14,12 +14,15 @@ import Dialog from '@material-ui/core/Dialog';
 
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import EditIcon from '@material-ui/icons/Edit';
+import PeolpleIcon from '@material-ui/icons/People';
 
 import {
 	DialogTitle,
 	DialogContent,
 	DialogActions,
-	TextField
+	TextField,
+	Divider
 } from '@material-ui/core';
 
 import Box from '@material-ui/core/Box';
@@ -39,6 +42,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const GruposModal = ({
+	grupoAtual,
 	grupos,
 	gruposInfo,
 	criarGrupo,
@@ -52,8 +56,9 @@ const GruposModal = ({
 
 	return (
 		<Dialog
+			fullScreen
 			fullWidth
-			PaperProps={{ className: classes.espacoDialog }}
+			//PaperProps={{ className: classes.espacoDialog }}
 			open={open}
 			onClose={onClose}
 			{...props}
@@ -108,7 +113,7 @@ const GruposModal = ({
 			</Formik>
 
 			<Box px={2} pt={1} pb={0} display="flex" alignItems="center">
-				<Typography variant="h6" component="div">
+				<Typography variant="h5" component="div">
 					Espacos
 				</Typography>
 
@@ -129,19 +134,53 @@ const GruposModal = ({
 				</Box>
 			</Box>
 
+			<Divider />
+
+			<Box px={3} py={2}>
+				<Box
+					display="flex"
+					justifyContent="space-between"
+					alignItems="center"
+					mb={0.5}
+				>
+					<Typography variant="h6" component="div">
+						{gruposInfo[grupoAtual].nome}
+					</Typography>
+					{gruposInfo[grupoAtual].membros && (
+						<IconButton aria-label="editar">
+							<EditIcon />
+						</IconButton>
+					)}
+				</Box>
+
+				{gruposInfo[grupoAtual].membros && (
+					<Button size="small" variant="outlined">
+						{gruposInfo[grupoAtual].membros.length} Membro
+						{gruposInfo[grupoAtual].membros.length > 1 && 's'}
+						<Box clone ml={1}>
+							<PeolpleIcon />
+						</Box>
+					</Button>
+				)}
+			</Box>
+
+			<Divider variant="middle" />
+
 			<Box clone px={2}>
 				<List>
-					{grupos.map(id => (
-						<ListItem
-							key={id}
-							button
-							component={Link}
-							to={gruposInfo[id].nome === 'Meu' ? '/meu' : `${id}`}
-							onClick={onClose}
-						>
-							<ListItemText primary={gruposInfo[id].nome} />
-						</ListItem>
-					))}
+					{grupos.map(id =>
+						id === grupoAtual ? null : (
+							<ListItem
+								key={id}
+								button
+								component={Link}
+								to={gruposInfo[id].nome === 'Meu' ? '/meu' : `${id}`}
+								onClick={onClose}
+							>
+								<ListItemText primary={gruposInfo[id].nome} />
+							</ListItem>
+						)
+					)}
 				</List>
 			</Box>
 		</Dialog>
