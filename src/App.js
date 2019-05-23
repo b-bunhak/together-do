@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -67,8 +68,10 @@ const App = ({ classes }) => {
 
 	useEffect(() => {
 		firebase.auth().onAuthStateChanged(user => {
-			setUsuario(user);
-			setUsuarioLoading(false);
+			ReactDOM.unstable_batchedUpdates(() => {
+				setUsuario(user);
+				setUsuarioLoading(false);
+			});
 		});
 	}, []);
 
@@ -102,20 +105,27 @@ const App = ({ classes }) => {
 
 					gruposIds.sort();
 
-					setGruposInfo(gruposInfo);
+					ReactDOM.unstable_batchedUpdates(() => {
+						setGruposInfo(gruposInfo);
 
-					if (!isEqual(grupos, gruposIds)) {
-						setGrupos(gruposIds);
-					}
+						if (!isEqual(grupos, gruposIds)) {
+							setGrupos(gruposIds);
+						}
 
-					setGruposLoading(false);
+						setGruposLoading(false);
+					});
 				});
 		}
 	}, [usuario]);
 
 	// Items
-	const [items, setItems] = useState(new Map());
-	const [itemsGrupos, setItemsGrupos] = useState({});
+	// const [items, setItems] = useState(new Map());
+	// const [itemsGrupos, setItemsGrupos] = useState({});
+
+	const [{ items, itemsGrupos }, setItems] = useState({
+		items: new Map(),
+		itemsGrupos: {}
+	});
 
 	useEffect(() => {
 		if (usuario) {
@@ -125,9 +135,12 @@ const App = ({ classes }) => {
 			// Acontece quando faz um sub muito rapido depois de um unSub
 			const timeout = setTimeout(() => {
 				unsubs = grupos.map(id => {
-					setItemsGrupos(itemsGrupos => ({
-						...itemsGrupos,
-						[id]: { ...itemsGrupos[id], loading: true }
+					setItems(({ itemsGrupos, ...items }) => ({
+						...items,
+						itemsGrupos: {
+							...itemsGrupos,
+							[id]: { ...itemsGrupos[id], loading: true }
+						}
 					}));
 
 					return firebase
@@ -136,7 +149,7 @@ const App = ({ classes }) => {
 						.where('dono', '==', id)
 						.orderBy('criadoData')
 						.onSnapshot(snapshot => {
-							setItems(items => {
+							setItems(({ items, itemsGrupos }) => {
 								const novoItems = new Map(items);
 
 								snapshot.docChanges().forEach(({ type, doc }) => {
@@ -185,17 +198,19 @@ const App = ({ classes }) => {
 									return dataA - dataB;
 								});
 
-								setItemsGrupos(itemsGrupos => ({
-									...itemsGrupos,
-									[id]: {
-										loading: false,
-										ids: grupoItemIds,
-										naoFeito,
-										feito,
-										ordemEntrega
+								return {
+									items: novoItems,
+									itemsGrupos: {
+										...itemsGrupos,
+										[id]: {
+											loading: false,
+											ids: grupoItemIds,
+											naoFeito,
+											feito,
+											ordemEntrega
+										}
 									}
-								}));
-								return novoItems;
+								};
 							});
 						});
 				});
@@ -527,7 +542,10 @@ const App = ({ classes }) => {
 												exact
 												path={`${url}/novo`}
 												render={routeProps => (
-													<Novo {...routeProps} adicionarItem={adicionarItem} />
+													<Novo
+														{...routeProps}
+														adicionarItem={item => adicionarItem(item, grupoId)}
+													/>
 												)}
 											/>
 

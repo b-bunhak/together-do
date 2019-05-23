@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
@@ -130,7 +132,13 @@ const GruposModal = ({
 			<Box clone px={2}>
 				<List>
 					{grupos.map(id => (
-						<ListItem key={id} button>
+						<ListItem
+							key={id}
+							button
+							component={Link}
+							to={gruposInfo[id].nome === 'Meu' ? '/meu' : `${id}`}
+							onClick={onClose}
+						>
 							<ListItemText primary={gruposInfo[id].nome} />
 						</ListItem>
 					))}
