@@ -119,9 +119,6 @@ const App = ({ classes }) => {
 	}, [usuario]);
 
 	// Items
-	// const [items, setItems] = useState(new Map());
-	// const [itemsGrupos, setItemsGrupos] = useState({});
-
 	const [{ items, itemsGrupos }, setItems] = useState({
 		items: new Map(),
 		itemsGrupos: {}
