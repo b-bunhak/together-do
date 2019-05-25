@@ -144,16 +144,16 @@ const GruposModal = ({
 					mb={0.5}
 				>
 					<Typography variant="h6" component="div">
-						{gruposInfo[grupoAtual].nome}
+						{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].nome}
 					</Typography>
-					{gruposInfo[grupoAtual].membros && (
+					{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].membros && (
 						<IconButton aria-label="editar">
 							<EditIcon />
 						</IconButton>
 					)}
 				</Box>
 
-				{gruposInfo[grupoAtual].membros && (
+				{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].membros && (
 					<Button size="small" variant="outlined">
 						{gruposInfo[grupoAtual].membros.length} Membro
 						{gruposInfo[grupoAtual].membros.length > 1 && 's'}
