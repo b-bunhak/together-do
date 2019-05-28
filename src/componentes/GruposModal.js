@@ -30,6 +30,7 @@ import Box from '@material-ui/core/Box';
 import { Formik, Form, Field } from 'formik';
 
 import * as yup from 'yup';
+import Membros from './Membros';
 
 const FormInicial = { nome: '' };
 
@@ -51,6 +52,8 @@ const GruposModal = ({
 	...props
 }) => {
 	const [novoFormVisivel, setNovoFormVisivel] = useState(false);
+
+	const [membrosTelaAberta, setMembrosTelaAberta] = useState(false);
 
 	const classes = useStyles();
 
@@ -154,7 +157,11 @@ const GruposModal = ({
 				</Box>
 
 				{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].membros && (
-					<Button size="small" variant="outlined">
+					<Button
+						size="small"
+						variant="outlined"
+						onClick={() => setMembrosTelaAberta(!membrosTelaAberta)}
+					>
 						{gruposInfo[grupoAtual].membros.length} Membro
 						{gruposInfo[grupoAtual].membros.length > 1 && 's'}
 						<Box clone ml={1}>
@@ -166,23 +173,27 @@ const GruposModal = ({
 
 			<Divider variant="middle" />
 
-			<Box clone px={2}>
-				<List>
-					{grupos.map(id =>
-						id === grupoAtual ? null : (
-							<ListItem
-								key={id}
-								button
-								component={Link}
-								to={gruposInfo[id].nome === 'Meu' ? '/meu' : `${id}`}
-								onClick={onClose}
-							>
-								<ListItemText primary={gruposInfo[id].nome} />
-							</ListItem>
-						)
-					)}
-				</List>
-			</Box>
+			{membrosTelaAberta ? (
+				<Membros onBack={() => setMembrosTelaAberta(false)} />
+			) : (
+				<Box clone px={2}>
+					<List>
+						{grupos.map(id =>
+							id === grupoAtual ? null : (
+								<ListItem
+									key={id}
+									button
+									component={Link}
+									to={gruposInfo[id].nome === 'Meu' ? '/meu' : `${id}`}
+									onClick={onClose}
+								>
+									<ListItemText primary={gruposInfo[id].nome} />
+								</ListItem>
+							)
+						)}
+					</List>
+				</Box>
+			)}
 		</Dialog>
 	);
 };
