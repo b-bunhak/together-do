@@ -43,9 +43,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const GruposModal = ({
+	usuarioId,
 	grupoAtual,
 	grupos,
 	gruposInfo,
+	membrosInfo,
 	criarGrupo,
 	open,
 	onClose,
@@ -174,7 +176,11 @@ const GruposModal = ({
 			<Divider variant="middle" />
 
 			{membrosTelaAberta ? (
-				<Membros onBack={() => setMembrosTelaAberta(false)} />
+				<Membros
+					usuarioId={usuarioId}
+					grupoInfo={gruposInfo[grupoAtual]}
+					membrosInfo={membrosInfo}
+				/>
 			) : (
 				<Box clone px={2}>
 					<List>

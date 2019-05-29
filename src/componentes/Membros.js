@@ -14,7 +14,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import Box from '@material-ui/core/Box';
 
-const Membros = () => {
+const Membros = ({
+	usuarioId,
+	grupoInfo: { membros = [], admins = [] },
+	membrosInfo,
+	...props
+}) => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 
 	function handleClick(event) {
@@ -26,28 +31,45 @@ const Membros = () => {
 	}
 
 	return (
-		<Box px={2}>
-			<ListItem button>
-				<ListItemText primary="Novo Membro" />
-			</ListItem>
-			<List>
-				<ListItem>
-					<ListItemText primary="Bruno" secondary="Admin" />
-					<ListItemSecondaryAction>
-						<IconButton edge="end" aria-label="Mais" onClick={handleClick}>
-							<MoreVertIcon />
-						</IconButton>
-						<Menu
-							id="simple-menu"
-							anchorEl={anchorEl}
-							open={Boolean(anchorEl)}
-							onClose={handleClose}
-						>
-							<MenuItem onClick={handleClose}>Remover Admin</MenuItem>
-							<MenuItem onClick={handleClose}>Remover Membro</MenuItem>
-						</Menu>
-					</ListItemSecondaryAction>
+		<Box px={2} {...props}>
+			{admins.includes(usuarioId) && (
+				<ListItem button>
+					<ListItemText primary="Novo Membro" />
 				</ListItem>
+			)}
+
+			<List>
+				{membros.map(
+					id =>
+						membrosInfo[id] && (
+							<ListItem key={id}>
+								<ListItemText
+									primary={membrosInfo[id].nome}
+									secondary={admins.includes(id) && 'Admin'}
+								/>
+								{id !== usuarioId && (
+									<ListItemSecondaryAction>
+										<IconButton
+											edge="end"
+											aria-label="Mais"
+											onClick={handleClick}
+										>
+											<MoreVertIcon />
+										</IconButton>
+										<Menu
+											id="simple-menu"
+											anchorEl={anchorEl}
+											open={Boolean(anchorEl)}
+											onClose={handleClose}
+										>
+											<MenuItem onClick={handleClose}>Remover Admin</MenuItem>
+											<MenuItem onClick={handleClose}>Remover Membro</MenuItem>
+										</Menu>
+									</ListItemSecondaryAction>
+								)}
+							</ListItem>
+						)
+				)}
 			</List>
 			<Button fullWidth color="secondary" variant="contained">
 				Sair do Grupo

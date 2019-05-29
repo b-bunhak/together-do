@@ -8,6 +8,12 @@ service cloud.firestore {
       return request.auth.uid in get(/databases/$(database)/documents/grupos/$(grupoId)).data.membros;
     }
 
+    match /usuarios/{usuario} {
+      allow read: if true;
+
+      allow write: if request.auth.uid == usuario;
+    }
+
     match /grupos/{grupo} {
       allow read: if request.auth.uid in resource.data.membros;
 

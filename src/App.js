@@ -15,7 +15,7 @@ import DateFnsUtils from '@date-io/date-fns';
 //import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
-import { partition, isEqual, sortBy } from 'lodash';
+import { partition, isEqual, sortBy, compact, uniq } from 'lodash';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -74,6 +74,31 @@ const App = ({ classes }) => {
 			});
 		});
 	}, []);
+
+	// Usuario Info
+	//const [usuarioInfoLoading, setUsuarioInfoLoading] = useState(true);
+	//const [usuarioInfo, setUsuarioInfo] = useState();
+
+	useEffect(() => {
+		if (usuario) {
+			//setUsuarioInfoLoading(true);
+
+			return firebase
+				.firestore()
+				.collection('usuarios')
+				.doc(usuario.uid)
+				.onSnapshot(snapshot => {
+					if (snapshot.get('nome') !== usuario.displayName) {
+						snapshot.ref.set({ nome: usuario.displayName }, { merge: true });
+					}
+
+					// ReactDOM.unstable_batchedUpdates(() => {
+					// 	setUsuarioInfoLoading(false);
+					// 	setUsuarioInfo(snapshot.data());
+					// });
+				});
+		}
+	}, [usuario]);
 
 	// Grupos
 	const [gruposLoading, setGruposLoading] = useState(true);
@@ -274,6 +299,44 @@ const App = ({ classes }) => {
 	// Grupos Modal
 	const [gruposModalVisivel, setGruposModalVisivel] = useState(false);
 
+	// Grupo Membros
+
+	const [grupoMembrosInfo, setGrupoMembrosInfo] = useState({});
+
+	useEffect(() => {
+		if (usuario) {
+			const usuarioIds = uniq(
+				compact(
+					grupos.flatMap(grupoId =>
+						grupoId === usuario.uid ? grupoId : gruposInfo[grupoId].membros
+					)
+				)
+			);
+
+			const unsubs = usuarioIds.map(usuarioId => {
+				return firebase
+					.firestore()
+					.collection('usuarios')
+					.doc(usuarioId)
+					.onSnapshot(snapshot => {
+						if (
+							usuarioId === usuario.uid &&
+							snapshot.get('nome') !== usuario.displayName
+						) {
+							snapshot.ref.set({ nome: usuario.displayName }, { merge: true });
+						}
+
+						setGrupoMembrosInfo(grupoMembrosInfo => ({
+							...grupoMembrosInfo,
+							[usuarioId]: snapshot.data()
+						}));
+					});
+			});
+
+			return () => unsubs.forEach(unsub => unsub());
+		}
+	}, [usuario, grupos, gruposInfo]);
+
 	/////////////
 
 	function adicionarItem(item, grupo = usuario.uid) {
@@ -453,9 +516,11 @@ const App = ({ classes }) => {
 								return (
 									<>
 										<GruposModal
+											usuarioId={usuario.uid}
 											grupoAtual={grupoId}
 											grupos={grupos}
 											gruposInfo={gruposInfo}
+											membrosInfo={grupoMembrosInfo}
 											criarGrupo={criarGrupo}
 											open={gruposModalVisivel}
 											onClose={() => setGruposModalVisivel(false)}
