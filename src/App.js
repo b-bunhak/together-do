@@ -33,6 +33,7 @@ import Lista from './paginas/Lista';
 import Feito from './paginas/Feito';
 import Novo from './paginas/Novo';
 import Visualizar from './paginas/Visualizar';
+import Convite from './paginas/Convite';
 
 const config = {
 	apiKey: 'AIzaSyBRYebCm20oXGiGoU9Njl9PtAADQ8OC468',
@@ -515,20 +516,35 @@ const App = ({ classes }) => {
 				) : !usuario ? (
 					<Login />
 				) : (
-					<>
+					<Switch>
+						<Route
+							exact
+							path="/"
+							render={() => {
+								return <Redirect to="/meu" />;
+							}}
+						/>
+
+						<Route
+							exact
+							path="/convite/:id"
+							render={routeProps => <Convite {...routeProps} />}
+						/>
+
 						<Route path="/:id">
-							{({ match }) => {
+							{({
+								match: {
+									params: { id },
+									url
+								}
+							}) => {
 								let grupoId = null;
 
-								if (match) {
-									const {
-										params: { id }
-									} = match;
-
+								if (id) {
 									grupoId = id === 'meu' ? usuario.uid : id;
 								}
 
-								return (
+								return grupoId && grupos.includes(grupoId) ? (
 									<>
 										<GruposModal
 											usuarioId={usuario.uid}
@@ -578,31 +594,7 @@ const App = ({ classes }) => {
 												</Button>
 											</Toolbar>
 										</AppBar>
-									</>
-								);
-							}}
-						</Route>
 
-						<Switch>
-							<Route
-								exact
-								path="/"
-								render={() => {
-									return <Redirect to="/meu" />;
-								}}
-							/>
-
-							<Route
-								path="/:id"
-								render={({
-									match: {
-										url,
-										params: { id }
-									}
-								}) => {
-									const grupoId = id === 'meu' ? usuario.uid : id;
-
-									return grupoId && grupos.includes(grupoId) ? (
 										<Switch>
 											<Route
 												exact
@@ -673,13 +665,13 @@ const App = ({ classes }) => {
 												}}
 											/>
 										</Switch>
-									) : (
-										<Redirect to="/" />
-									);
-								}}
-							/>
-						</Switch>
-					</>
+									</>
+								) : (
+									<Redirect to="/" />
+								);
+							}}
+						</Route>
+					</Switch>
 				)}
 			</React.Fragment>
 		</MuiPickersUtilsProvider>
