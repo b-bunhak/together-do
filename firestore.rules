@@ -8,6 +8,10 @@ service cloud.firestore {
       return request.auth.uid in get(/databases/$(database)/documents/grupos/$(grupoId)).data.membros;
     }
 
+    function grupoAdmin(grupoId) {
+      return request.auth.uid in get(/databases/$(database)/documents/grupos/$(grupoId)).data.admins;
+    }
+
     match /usuarios/{usuario} {
       allow read: if true;
 
@@ -40,6 +44,10 @@ service cloud.firestore {
 
     match /ordemTipo/{usuario} {
       allow read, write: if request.auth.uid == usuario;
+    }
+
+    match /convites/{convite} {
+      allow create: if grupoAdmin(request.resource.data.grupo)
     }
   }
 }

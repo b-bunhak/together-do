@@ -18,6 +18,7 @@ const Membros = ({
 	usuarioId,
 	grupoInfo: { membros = [], admins = [] },
 	membrosInfo,
+	novoMembro,
 	...props
 }) => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
@@ -33,7 +34,7 @@ const Membros = ({
 	return (
 		<Box px={2} {...props}>
 			{admins.includes(usuarioId) && (
-				<ListItem button>
+				<ListItem button onClick={novoMembro}>
 					<ListItemText primary="Novo Membro" />
 				</ListItem>
 			)}

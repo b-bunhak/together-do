@@ -51,6 +51,7 @@ const GruposModal = ({
 	criarGrupo,
 	open,
 	onClose,
+	novoMembro,
 	...props
 }) => {
 	const [novoFormVisivel, setNovoFormVisivel] = useState(false);
@@ -180,6 +181,7 @@ const GruposModal = ({
 					usuarioId={usuarioId}
 					grupoInfo={gruposInfo[grupoAtual]}
 					membrosInfo={membrosInfo}
+					novoMembro={novoMembro}
 				/>
 			) : (
 				<Box clone px={2}>

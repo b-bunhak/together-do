@@ -488,6 +488,21 @@ const App = ({ classes }) => {
 		});
 	}
 
+	function novoMembro(grupo) {
+		const conviteRef = firebase
+			.firestore()
+			.collection('convites')
+			.doc();
+
+		const convite = {
+			id: conviteRef.id,
+			grupo,
+			valido: true
+		};
+
+		return conviteRef.set(convite);
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
@@ -524,6 +539,7 @@ const App = ({ classes }) => {
 											criarGrupo={criarGrupo}
 											open={gruposModalVisivel}
 											onClose={() => setGruposModalVisivel(false)}
+											novoMembro={() => novoMembro(grupoId)}
 										/>
 
 										<AppBar position="static">
