@@ -16,7 +16,7 @@ const styles = theme => ({
 		padding: theme.spacing(2),
 		display: 'flex',
 		justifyContent: 'center',
-		aliginItems: 'center'
+		alignItems: 'center'
 	},
 	authContainer: {
 		display: 'flex',
