@@ -47,7 +47,11 @@ service cloud.firestore {
     }
 
     match /convites/{convite} {
-      allow create: if grupoAdmin(request.resource.data.grupo)
+		allow get: if request.auth != null && resource.data.valido == true;
+		
+		allow create: if grupoAdmin(request.resource.data.grupo)
+		
+		allow update: if grupoMembro(resource.data.grupo) == false && request.resource.data.id == resource.data.id && request.resource.data.grupo == resource.data.grupo && request.resource.data.usuarioAceito == request.auth.uid && request.resource.data.valido == false
     }
   }
 }
