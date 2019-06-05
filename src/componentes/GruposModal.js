@@ -52,6 +52,7 @@ const GruposModal = ({
 	open,
 	onClose,
 	novoMembro,
+	removerMembro,
 	convites,
 	deletarConvite,
 	...props
@@ -185,6 +186,7 @@ const GruposModal = ({
 					grupoInfo={gruposInfo[grupoAtual]}
 					membrosInfo={membrosInfo}
 					novoMembro={novoMembro}
+					removerMembro={removerMembro}
 					convites={convites[grupoAtual]}
 					deletarConvite={deletarConvite}
 				/>

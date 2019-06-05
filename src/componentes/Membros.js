@@ -38,6 +38,7 @@ const Membros = ({
 	novoMembro,
 	convites = null,
 	deletarConvite,
+	removerMembro,
 	...props
 }) => {
 	const classes = useStyles();
@@ -144,7 +145,12 @@ const Membros = ({
 												onClose={handleClose}
 											>
 												<MenuItem onClick={handleClose}>Remover Admin</MenuItem>
-												<MenuItem onClick={handleClose}>
+												<MenuItem
+													onClick={() => {
+														removerMembro(id);
+														handleClose();
+													}}
+												>
 													Remover Membro
 												</MenuItem>
 											</Menu>

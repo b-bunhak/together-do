@@ -539,6 +539,28 @@ const App = ({ classes }) => {
 		return conviteRef.set(convite).then(() => convite.id);
 	}
 
+	function removerMembro(grupoId, membroId) {
+		const db = firebase.firestore();
+
+		const grupoRef = db.collection('grupos').doc(grupoId);
+
+		return db.runTransaction(transaction =>
+			transaction.get(grupoRef).then(grupoDoc => {
+				const admins = grupoDoc.get('admins');
+				const membros = grupoDoc.get('membros');
+
+				return transaction.set(
+					grupoRef,
+					{
+						admins: admins.filter(id => id !== membroId),
+						membros: membros.filter(id => id !== membroId)
+					},
+					{ merge: true }
+				);
+			})
+		);
+	}
+
 	function deletarConvite(conviteId) {
 		const conviteRef = firebase
 			.firestore()
@@ -600,6 +622,7 @@ const App = ({ classes }) => {
 											open={gruposModalVisivel}
 											onClose={() => setGruposModalVisivel(false)}
 											novoMembro={() => novoMembro(grupoId)}
+											removerMembro={membro => removerMembro(grupoId, membro)}
 											convites={convites}
 											deletarConvite={deletarConvite}
 										/>
