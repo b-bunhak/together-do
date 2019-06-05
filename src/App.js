@@ -350,13 +350,18 @@ const App = ({ classes }) => {
 					gruposInfo[grupoId].admins.includes(usuario.uid)
 				) {
 					gruposArray.push(grupoId);
+				} else {
+					setConvites(convites => ({
+						...convites,
+						[grupoId]: undefined
+					}));
 				}
 
 				return gruposArray;
 			}, []);
 
-			const unSubs = gruposAdmin.map(grupoId =>
-				firebase
+			const unSubs = gruposAdmin.map(grupoId => {
+				return firebase
 					.firestore()
 					.collection('convites')
 					.where('grupo', '==', grupoId)
@@ -366,8 +371,8 @@ const App = ({ classes }) => {
 							...convites,
 							[grupoId]: snapshot.docs.map(doc => doc.data())
 						}));
-					})
-			);
+					});
+			});
 
 			return () => unSubs.forEach(unSub => unSub());
 		}
@@ -561,6 +566,48 @@ const App = ({ classes }) => {
 		);
 	}
 
+	function fazerAdmin(grupoId, membroId) {
+		const db = firebase.firestore();
+
+		const grupoRef = db.collection('grupos').doc(grupoId);
+
+		return db.runTransaction(transaction =>
+			transaction.get(grupoRef).then(grupoDoc => {
+				const admins = grupoDoc.get('admins');
+				const membros = grupoDoc.get('membros');
+
+				return transaction.set(
+					grupoRef,
+					{
+						admins: uniq([...admins, membroId]),
+						membros: uniq([...membros, membroId])
+					},
+					{ merge: true }
+				);
+			})
+		);
+	}
+
+	function removerAdmin(grupoId, membroId) {
+		const db = firebase.firestore();
+
+		const grupoRef = db.collection('grupos').doc(grupoId);
+
+		return db.runTransaction(transaction =>
+			transaction.get(grupoRef).then(grupoDoc => {
+				const admins = grupoDoc.get('admins');
+
+				return transaction.set(
+					grupoRef,
+					{
+						admins: admins.filter(id => id !== membroId)
+					},
+					{ merge: true }
+				);
+			})
+		);
+	}
+
 	function deletarConvite(conviteId) {
 		const conviteRef = firebase
 			.firestore()
@@ -623,6 +670,8 @@ const App = ({ classes }) => {
 											onClose={() => setGruposModalVisivel(false)}
 											novoMembro={() => novoMembro(grupoId)}
 											removerMembro={membro => removerMembro(grupoId, membro)}
+											fazerAdmin={membro => fazerAdmin(grupoId, membro)}
+											removerAdmin={membro => removerAdmin(grupoId, membro)}
 											convites={convites}
 											deletarConvite={deletarConvite}
 										/>

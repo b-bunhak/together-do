@@ -39,6 +39,8 @@ const Membros = ({
 	convites = null,
 	deletarConvite,
 	removerMembro,
+	fazerAdmin,
+	removerAdmin,
 	...props
 }) => {
 	const classes = useStyles();
@@ -133,7 +135,7 @@ const Membros = ({
 										primary={membrosInfo[id].nome}
 										secondary={admins.includes(id) && 'Admin'}
 									/>
-									{id !== usuarioId && (
+									{id !== usuarioId && admins.includes(usuarioId) && 'Admin' && (
 										<ListItemSecondaryAction>
 											<IconButton aria-label="Mais" onClick={handleClick}>
 												<MoreVertIcon />
@@ -144,7 +146,25 @@ const Membros = ({
 												open={Boolean(anchorEl)}
 												onClose={handleClose}
 											>
-												<MenuItem onClick={handleClose}>Remover Admin</MenuItem>
+												{admins.includes(id) ? (
+													<MenuItem
+														onClick={() => {
+															removerAdmin(id);
+															handleClose();
+														}}
+													>
+														Remover Admin
+													</MenuItem>
+												) : (
+													<MenuItem
+														onClick={() => {
+															fazerAdmin(id);
+															handleClose();
+														}}
+													>
+														Fazer Admin
+													</MenuItem>
+												)}
 												<MenuItem
 													onClick={() => {
 														removerMembro(id);
