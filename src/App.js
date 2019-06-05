@@ -373,8 +373,6 @@ const App = ({ classes }) => {
 		}
 	}, [usuario, grupos, gruposInfo]);
 
-	console.log(convites);
-
 	/////////////
 
 	function adicionarItem(item, grupo = usuario.uid) {
@@ -541,6 +539,15 @@ const App = ({ classes }) => {
 		return conviteRef.set(convite).then(() => convite.id);
 	}
 
+	function deletarConvite(conviteId) {
+		const conviteRef = firebase
+			.firestore()
+			.collection('convites')
+			.doc(conviteId);
+
+		return conviteRef.delete();
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
@@ -594,6 +601,7 @@ const App = ({ classes }) => {
 											onClose={() => setGruposModalVisivel(false)}
 											novoMembro={() => novoMembro(grupoId)}
 											convites={convites}
+											deletarConvite={deletarConvite}
 										/>
 
 										<AppBar position="static">

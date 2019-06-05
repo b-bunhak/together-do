@@ -53,6 +53,7 @@ const GruposModal = ({
 	onClose,
 	novoMembro,
 	convites,
+	deletarConvite,
 	...props
 }) => {
 	const [novoFormVisivel, setNovoFormVisivel] = useState(false);
@@ -185,6 +186,7 @@ const GruposModal = ({
 					membrosInfo={membrosInfo}
 					novoMembro={novoMembro}
 					convites={convites[grupoAtual]}
+					deletarConvite={deletarConvite}
 				/>
 			) : (
 				<Box clone px={2}>

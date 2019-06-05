@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -11,25 +11,21 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import CopyIcon from '@material-ui/icons/FileCopy';
 
 import Snackbar from '@material-ui/core/Snackbar';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
+
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
 import TextField from '@material-ui/core/TextField';
-import Input from '@material-ui/core/Input';
-import InputAdornment from '@material-ui/core/InputAdornment';
 
 import Box from '@material-ui/core/Box';
-import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
 	conviteDialogPaper: { margin: theme.spacing(2) }
@@ -41,6 +37,7 @@ const Membros = ({
 	membrosInfo,
 	novoMembro,
 	convites = null,
+	deletarConvite,
 	...props
 }) => {
 	const classes = useStyles();
@@ -49,7 +46,7 @@ const Membros = ({
 
 	const [snackbarAberto, setSnackbarAberto] = useState(false);
 
-	const [conviteUrl, setConviteUrl] = useState('');
+	const [conviteId, setConviteId] = useState(null);
 
 	const [anchorEl, setAnchorEl] = useState(null);
 
@@ -76,8 +73,8 @@ const Membros = ({
 			<Dialog
 				fullWidth
 				PaperProps={{ className: classes.conviteDialogPaper }}
-				open={Boolean(conviteUrl)}
-				onClose={() => setConviteUrl('')}
+				open={Boolean(conviteId)}
+				onClose={() => setConviteId(null)}
 			>
 				<Snackbar
 					open={snackbarAberto}
@@ -93,26 +90,30 @@ const Membros = ({
 						fullWidth
 						variant="outlined"
 						type="text"
-						value={conviteUrl}
+						value={
+							conviteId
+								? `${window.location.hostname}/convite/${conviteId}`
+								: ''
+						}
 						inputProps={{
 							readOnly: true
 						}}
-						// InputProps={{
-						// 	endAdornment: (
-						// 		<InputAdornment position="end">
-						// 			<CopyIcon />
-						// 		</InputAdornment>
-						// 	)
-						// }}
 						onClick={inputClick}
 					/>
 				</DialogContent>
 
 				<DialogActions>
 					<Box clone mr="auto">
-						<Button color="secondary">Deletar</Button>
+						<Button
+							color="secondary"
+							onClick={() =>
+								deletarConvite(conviteId).then(() => setConviteId(null))
+							}
+						>
+							Deletar
+						</Button>
 					</Box>
-					<Button onClick={() => setConviteUrl('')}>Fechar</Button>
+					<Button onClick={() => setConviteId(null)}>Fechar</Button>
 				</DialogActions>
 			</Dialog>
 			<Box
@@ -161,11 +162,7 @@ const Membros = ({
 								{convites.map((convite, index) => (
 									<ListItem
 										key={convite.id}
-										onClick={() =>
-											setConviteUrl(
-												window.location.hostname + '/convite/' + convite.id
-											)
-										}
+										onClick={() => setConviteId(convite.id)}
 									>
 										<ListItemText primary={`Convite ${index + 1}`} />
 									</ListItem>
@@ -186,7 +183,7 @@ const Membros = ({
 						onClick={() => {
 							setCriandoConvite(true);
 							novoMembro().then(conviteId => {
-								setConviteUrl(`${window.location.hostname}/${conviteId}`);
+								setConviteId(conviteId);
 								setCriandoConvite(false);
 							});
 						}}
