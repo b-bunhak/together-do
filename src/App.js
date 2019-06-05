@@ -338,6 +338,43 @@ const App = ({ classes }) => {
 		}
 	}, [usuario, grupos, gruposInfo]);
 
+	// Convites
+
+	const [convites, setConvites] = useState({});
+
+	useEffect(() => {
+		if (usuario) {
+			const gruposAdmin = grupos.reduce((gruposArray, grupoId) => {
+				if (
+					grupoId !== usuario.uid &&
+					gruposInfo[grupoId].admins.includes(usuario.uid)
+				) {
+					gruposArray.push(grupoId);
+				}
+
+				return gruposArray;
+			}, []);
+
+			const unSubs = gruposAdmin.map(grupoId =>
+				firebase
+					.firestore()
+					.collection('convites')
+					.where('grupo', '==', grupoId)
+					.where('valido', '==', true)
+					.onSnapshot(snapshot => {
+						setConvites(convites => ({
+							...convites,
+							[grupoId]: snapshot.docs.map(doc => doc.data())
+						}));
+					})
+			);
+
+			return () => unSubs.forEach(unSub => unSub());
+		}
+	}, [usuario, grupos, gruposInfo]);
+
+	console.log(convites);
+
 	/////////////
 
 	function adicionarItem(item, grupo = usuario.uid) {
@@ -501,7 +538,7 @@ const App = ({ classes }) => {
 			valido: true
 		};
 
-		return conviteRef.set(convite);
+		return conviteRef.set(convite).then(() => convite.id);
 	}
 
 	return (
@@ -556,6 +593,7 @@ const App = ({ classes }) => {
 											open={gruposModalVisivel}
 											onClose={() => setGruposModalVisivel(false)}
 											novoMembro={() => novoMembro(grupoId)}
+											convites={convites}
 										/>
 
 										<AppBar position="static">

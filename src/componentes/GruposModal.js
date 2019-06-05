@@ -52,6 +52,7 @@ const GruposModal = ({
 	open,
 	onClose,
 	novoMembro,
+	convites,
 	...props
 }) => {
 	const [novoFormVisivel, setNovoFormVisivel] = useState(false);
@@ -64,6 +65,7 @@ const GruposModal = ({
 		<Dialog
 			fullScreen
 			fullWidth
+			scroll="paper"
 			//PaperProps={{ className: classes.espacoDialog }}
 			open={open}
 			onClose={onClose}
@@ -182,6 +184,7 @@ const GruposModal = ({
 					grupoInfo={gruposInfo[grupoAtual]}
 					membrosInfo={membrosInfo}
 					novoMembro={novoMembro}
+					convites={convites[grupoAtual]}
 				/>
 			) : (
 				<Box clone px={2}>
