@@ -710,7 +710,7 @@ const App = ({ classes }) => {
 											gruposInfo={gruposInfo}
 											membrosInfo={grupoMembrosInfo}
 											criarGrupo={criarGrupo}
-											alterarGrupoNome={alterarGrupoNome}
+											alterarGrupoNome={nome => alterarGrupoNome(grupoId, nome)}
 											open={gruposModalVisivel}
 											onClose={() => setGruposModalVisivel(false)}
 											novoMembro={() => novoMembro(grupoId)}

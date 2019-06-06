@@ -97,7 +97,11 @@ const GruposModal = ({
 				initialValues={formInicial}
 				validationSchema={schema}
 				onSubmit={(values, { resetForm }) => {
-					return criarGrupo(values.nome).then(() => {
+					const submit = Boolean(formInicial.nome)
+						? alterarGrupoNome
+						: criarGrupo;
+
+					return submit(values.nome).then(() => {
 						fecharForm();
 						resetForm();
 					});
