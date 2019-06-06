@@ -528,6 +528,20 @@ const App = ({ classes }) => {
 		});
 	}
 
+	function alterarGrupoNome(grupoId, nome) {
+		const gruposRef = firebase
+			.firestore()
+			.collection('grupos')
+			.doc(grupoId);
+
+		return gruposRef.set(
+			{
+				nome
+			},
+			{ merge: true }
+		);
+	}
+
 	function novoMembro(grupo) {
 		const conviteRef = firebase
 			.firestore()
@@ -696,6 +710,7 @@ const App = ({ classes }) => {
 											gruposInfo={gruposInfo}
 											membrosInfo={grupoMembrosInfo}
 											criarGrupo={criarGrupo}
+											alterarGrupoNome={alterarGrupoNome}
 											open={gruposModalVisivel}
 											onClose={() => setGruposModalVisivel(false)}
 											novoMembro={() => novoMembro(grupoId)}

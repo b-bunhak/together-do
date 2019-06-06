@@ -17,8 +17,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import EditIcon from '@material-ui/icons/Edit';
 import PeolpleIcon from '@material-ui/icons/People';
 
+import Fade from '@material-ui/core/Fade';
+
 import {
-	DialogTitle,
 	DialogContent,
 	DialogActions,
 	TextField,
@@ -31,8 +32,6 @@ import { Formik, Form, Field } from 'formik';
 
 import * as yup from 'yup';
 import Membros from './Membros';
-
-const FormInicial = { nome: '' };
 
 const schema = yup.object().shape({
 	nome: yup.string().required()
@@ -49,6 +48,7 @@ const GruposModal = ({
 	gruposInfo,
 	membrosInfo,
 	criarGrupo,
+	alterarGrupoNome,
 	open,
 	onClose,
 	novoMembro,
@@ -60,11 +60,27 @@ const GruposModal = ({
 	sairGrupo,
 	...props
 }) => {
-	const [novoFormVisivel, setNovoFormVisivel] = useState(false);
+	const [formInicial, setFormInicial] = useState({ nome: '' });
+
+	const [formVisivel, setFormVisivel] = useState(false);
 
 	const [membrosTelaAberta, setMembrosTelaAberta] = useState(false);
 
 	const classes = useStyles();
+
+	function openCriarForm() {
+		setFormVisivel(true);
+	}
+
+	function openUpdateForm() {
+		setFormInicial({ nome: gruposInfo[grupoAtual].nome });
+		setFormVisivel(true);
+	}
+
+	function fecharForm() {
+		setFormVisivel(false);
+		setFormInicial({ nome: '' });
+	}
 
 	return (
 		<Dialog
@@ -77,21 +93,24 @@ const GruposModal = ({
 			{...props}
 		>
 			<Formik
-				initialValues={FormInicial}
+				enableReinitialize
+				initialValues={formInicial}
 				validationSchema={schema}
-				onSubmit={values => {
-					return criarGrupo(values.nome).then(() => setNovoFormVisivel(false));
+				onSubmit={(values, { resetForm }) => {
+					return criarGrupo(values.nome).then(() => {
+						fecharForm();
+						resetForm();
+					});
 				}}
 			>
 				{() => (
 					<Dialog
 						fullWidth
 						PaperProps={{ className: classes.espacoDialog }}
-						open={novoFormVisivel}
-						onClose={() => setNovoFormVisivel(false)}
+						open={formVisivel}
+						onClose={fecharForm}
 					>
 						<Form>
-							<DialogTitle>Novo</DialogTitle>
 							<DialogContent>
 								<Field name="nome">
 									{({ field, form: { touched, errors } }) => (
@@ -109,15 +128,11 @@ const GruposModal = ({
 								</Field>
 							</DialogContent>
 							<DialogActions>
-								<Button
-									color="primary"
-									type="reset"
-									onClick={() => setNovoFormVisivel(false)}
-								>
+								<Button color="primary" type="reset" onClick={fecharForm}>
 									Cancelar
 								</Button>
 								<Button color="primary" type="submit">
-									Criar
+									{Boolean(formInicial.nome) ? 'Salvar' : 'Criar'}
 								</Button>
 							</DialogActions>
 						</Form>
@@ -127,15 +142,11 @@ const GruposModal = ({
 
 			<Box px={2} pt={1} pb={0} display="flex" alignItems="center">
 				<Typography variant="h5" component="div">
-					Espacos
+					Grupos
 				</Typography>
 
 				<Box clone ml={1}>
-					<Button
-						variant="outlined"
-						size="small"
-						onClick={() => setNovoFormVisivel(true)}
-					>
+					<Button variant="outlined" size="small" onClick={openCriarForm}>
 						Criar
 					</Button>
 				</Box>
@@ -156,14 +167,20 @@ const GruposModal = ({
 					alignItems="center"
 					mb={0.5}
 				>
-					<Typography variant="h6" component="div">
+					<Typography variant="h6" component="div" gutterBottom>
 						{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].nome}
 					</Typography>
-					{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].membros && (
-						<IconButton aria-label="editar">
+					<Fade
+						in={
+							gruposInfo[grupoAtual] &&
+							gruposInfo[grupoAtual].membros &&
+							gruposInfo[grupoAtual].admins.includes(usuarioId)
+						}
+					>
+						<IconButton aria-label="editar" onClick={openUpdateForm}>
 							<EditIcon />
 						</IconButton>
-					)}
+					</Fade>
 				</Box>
 
 				{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].membros && (
