@@ -117,7 +117,7 @@ const App = ({ classes }) => {
 					const gruposInfo = {
 						[usuario.uid]: {
 							id: usuario.uid,
-							nome: 'Meu'
+							nome: 'Eu'
 						}
 					};
 
@@ -678,7 +678,7 @@ const App = ({ classes }) => {
 							exact
 							path="/"
 							render={() => {
-								return <Redirect to="/meu" />;
+								return <Redirect to="/eu" />;
 							}}
 						/>
 
@@ -698,7 +698,7 @@ const App = ({ classes }) => {
 								let grupoId = null;
 
 								if (id) {
-									grupoId = id === 'meu' ? usuario.uid : id;
+									grupoId = id === 'eu' ? usuario.uid : id;
 								}
 
 								return grupoId && grupos.includes(grupoId) ? (
