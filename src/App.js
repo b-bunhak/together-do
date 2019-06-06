@@ -12,7 +12,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 import DateFnsUtils from '@date-io/date-fns';
 
-//import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 import { partition, isEqual, sortBy, compact, uniq } from 'lodash';
@@ -617,6 +616,37 @@ const App = ({ classes }) => {
 		return conviteRef.delete();
 	}
 
+	function sairGrupo(grupoId) {
+		const db = firebase.firestore();
+
+		const grupoRef = db.collection('grupos').doc(grupoId);
+
+		return db
+			.runTransaction(transaction =>
+				transaction.get(grupoRef).then(grupoDoc => {
+					const admins = grupoDoc.get('admins');
+					const membros = grupoDoc.get('membros');
+
+					const novoAdmins = admins.filter(id => id !== usuario.uid);
+					const novoMembros = membros.filter(id => id !== usuario.uid);
+
+					if (novoAdmins.length === 0 && novoMembros.length > 0) {
+						novoAdmins.push(novoMembros[0]);
+					}
+
+					return transaction.set(
+						grupoRef,
+						{
+							admins: novoAdmins,
+							membros: novoMembros
+						},
+						{ merge: true }
+					);
+				})
+			)
+			.then(() => setGrupos(grupos.filter(id => id !== grupoId)));
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
@@ -674,6 +704,7 @@ const App = ({ classes }) => {
 											removerAdmin={membro => removerAdmin(grupoId, membro)}
 											convites={convites}
 											deletarConvite={deletarConvite}
+											sairGrupo={() => sairGrupo(grupoId)}
 										/>
 
 										<AppBar position="static">

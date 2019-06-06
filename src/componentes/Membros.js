@@ -41,6 +41,7 @@ const Membros = ({
 	removerMembro,
 	fazerAdmin,
 	removerAdmin,
+	sairGrupo,
 	...props
 }) => {
 	const classes = useStyles();
@@ -220,7 +221,12 @@ const Membros = ({
 			)}
 
 			<Box clone my={1}>
-				<Button fullWidth color="secondary" variant="outlined">
+				<Button
+					fullWidth
+					color="secondary"
+					variant="outlined"
+					onClick={sairGrupo}
+				>
 					Sair do Grupo
 				</Button>
 			</Box>

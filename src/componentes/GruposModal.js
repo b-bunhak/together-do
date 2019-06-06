@@ -57,6 +57,7 @@ const GruposModal = ({
 	removerAdmin,
 	convites,
 	deletarConvite,
+	sairGrupo,
 	...props
 }) => {
 	const [novoFormVisivel, setNovoFormVisivel] = useState(false);
@@ -193,6 +194,7 @@ const GruposModal = ({
 					removerAdmin={removerAdmin}
 					convites={convites[grupoAtual]}
 					deletarConvite={deletarConvite}
+					sairGrupo={sairGrupo}
 				/>
 			) : (
 				<Box clone px={2}>
