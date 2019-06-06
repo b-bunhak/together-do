@@ -214,10 +214,15 @@ const GruposModal = ({
 					sairGrupo={sairGrupo}
 				/>
 			) : (
-				<Box clone px={2}>
+				<Box clone px={2} css={{ overflowY: 'scroll' }}>
 					<List>
+						{grupoAtual !== usuarioId && (
+							<ListItem button component={Link} to="/eu" onClick={onClose}>
+								<ListItemText primary={gruposInfo[usuarioId].nome} />
+							</ListItem>
+						)}
 						{grupos.map(id =>
-							id === grupoAtual ? null : (
+							id === grupoAtual || id === usuarioId ? null : (
 								<ListItem
 									key={id}
 									button
