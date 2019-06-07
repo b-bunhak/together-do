@@ -28,7 +28,7 @@ import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles(theme => ({
-	conviteDialogPaper: { margin: theme.spacing(2) }
+	conviteDialogPaper: { margin: theme.spacing(2), width: '100%' }
 }));
 
 const Membros = ({
@@ -75,7 +75,6 @@ const Membros = ({
 	return (
 		<Box px={2} display="flex" flexDirection="column" {...props}>
 			<Dialog
-				fullWidth
 				PaperProps={{ className: classes.conviteDialogPaper }}
 				open={Boolean(conviteId)}
 				onClose={() => setConviteId(null)}

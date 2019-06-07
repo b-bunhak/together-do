@@ -38,7 +38,7 @@ const schema = yup.object().shape({
 });
 
 const useStyles = makeStyles(theme => ({
-	espacoDialog: { margin: theme.spacing(2) }
+	espacoDialog: { margin: theme.spacing(2), width: '100%' }
 }));
 
 const GruposModal = ({
@@ -109,7 +109,6 @@ const GruposModal = ({
 			>
 				{() => (
 					<Dialog
-						fullWidth
 						PaperProps={{ className: classes.espacoDialog }}
 						open={formVisivel}
 						onClose={fecharForm}
