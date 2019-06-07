@@ -102,15 +102,16 @@ const Formulario = ({
 			{({ values, resetForm }) => (
 				<>
 					<Box display="flex" justifyContent="space-between">
-						<IconButton component={Link} to={voltarLink} replace>
-							<BackIcon />
-						</IconButton>
-
 						{!editar && (
 							<Button component={Link} to="?editar=true">
 								Editar
 							</Button>
 						)}
+						<Box clone ml="auto">
+							<IconButton component={Link} to={voltarLink} replace>
+								<BackIcon />
+							</IconButton>
+						</Box>
 					</Box>
 
 					<Divider />
