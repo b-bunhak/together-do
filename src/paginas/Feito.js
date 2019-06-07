@@ -51,7 +51,7 @@ const styles = theme => ({
 const Feito = ({
 	classes,
 	items,
-	grupo: { feito = [] },
+	grupo: { feito = [] } = {},
 	alterarFeito,
 	match
 }) => {
