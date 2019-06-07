@@ -132,9 +132,9 @@ const App = ({ classes }) => {
 					ReactDOM.unstable_batchedUpdates(() => {
 						setGruposInfo(gruposInfo);
 
-						if (!isEqual(grupos, gruposIds)) {
-							setGrupos(gruposIds);
-						}
+						setGrupos(grupos =>
+							!isEqual(grupos, gruposIds) ? gruposIds : null
+						);
 
 						setGruposLoading(false);
 					});
