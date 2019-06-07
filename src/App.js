@@ -803,10 +803,11 @@ const App = ({ classes }) => {
 
 											<Route
 												exact
-												path={`${url}/:id`}
+												path={[`${url}/:id`, `${url}/feito/:id`]}
 												render={routeProps => {
 													const {
 														match: {
+															url,
 															params: { id }
 														}
 													} = routeProps;
@@ -824,7 +825,11 @@ const App = ({ classes }) => {
 															/>
 														);
 													} else {
-														return <Redirect to="/" />;
+														return (
+															<Redirect
+																to={url.substring(0, url.lastIndexOf('/'))}
+															/>
+														);
 													}
 												}}
 											/>

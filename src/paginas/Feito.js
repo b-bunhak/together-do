@@ -87,7 +87,7 @@ const Feito = ({
 							<Typography
 								noWrap
 								component={Link}
-								to={`/${item.id}`}
+								to={`./feito/${item.id}`}
 								className={classes.itemLink}
 							>
 								{item.item}
