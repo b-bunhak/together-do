@@ -133,7 +133,7 @@ const App = ({ classes }) => {
 						setGruposInfo(gruposInfo);
 
 						setGrupos(grupos =>
-							!isEqual(grupos, gruposIds) ? gruposIds : null
+							!isEqual(grupos, gruposIds) ? gruposIds : grupos
 						);
 
 						setGruposLoading(false);
