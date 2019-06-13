@@ -60,6 +60,12 @@ service cloud.firestore {
       allow delete: if grupoAdmin(resource.data.grupo);
     }
 
+    match /chats/{mensagem} {
+      allow read: if grupoMembro(resource.data.grupo);
+
+      allow create: if grupoMembro(request.resource.data.grupo);
+    }
+
    
   }
 }

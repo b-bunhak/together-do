@@ -33,6 +33,7 @@ import Feito from './paginas/Feito';
 import Novo from './paginas/Novo';
 import Visualizar from './paginas/Visualizar';
 import Convite from './paginas/Convite';
+import BatePapo from './paginas/BatePapo';
 
 const config = {
 	apiKey: 'AIzaSyBRYebCm20oXGiGoU9Njl9PtAADQ8OC468',
@@ -377,6 +378,36 @@ const App = ({ classes }) => {
 		}
 	}, [usuario, grupos, gruposInfo]);
 
+	// Chat
+	const [chats, setChat] = useState({});
+
+	useEffect(() => {
+		if (usuario) {
+			const unsubs = grupos
+				.filter(id => id !== usuario.uid)
+				.map(grupoId => {
+					return firebase
+						.firestore()
+						.collection('chats')
+						.where('grupo', '==', grupoId)
+						.orderBy('data')
+						.onSnapshot(snapshot => {
+							setChat(chat => ({
+								...chat,
+								[grupoId]: snapshot.docs.map(doc => ({
+									...doc.data(),
+									data: doc
+										.get('data', { serverTimestamps: 'estimate' })
+										.toDate()
+								}))
+							}));
+						});
+				});
+
+			return () => unsubs.forEach(unsub => unsub());
+		}
+	}, [usuario, grupos]);
+
 	/////////////
 
 	function adicionarItem(item, grupo = usuario.uid) {
@@ -661,6 +692,21 @@ const App = ({ classes }) => {
 			.then(() => setGrupos(grupos.filter(id => id !== grupoId)));
 	}
 
+	function enviarMensagem(grupoId, mensagen) {
+		const mensagenRef = firebase
+			.firestore()
+			.collection('chats')
+			.doc();
+
+		mensagenRef.set({
+			id: mensagenRef.id,
+			autor: usuario.uid,
+			data: firebase.firestore.FieldValue.serverTimestamp(),
+			mensagen: mensagen,
+			grupo: grupoId
+		});
+	}
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
@@ -773,6 +819,22 @@ const App = ({ classes }) => {
 														alterarOrdem={ordem => alterarOrdem(ordem, grupoId)}
 														ordemTipo={ordemTipo}
 														setOrdemTipo={alterarOrdemTipo}
+													/>
+												)}
+											/>
+
+											<Route
+												exact
+												path={`${url}/chat`}
+												render={routeProps => (
+													<BatePapo
+														{...routeProps}
+														mensagens={chats[grupoId]}
+														enviarMensagem={mensagen =>
+															enviarMensagem(grupoId, mensagen)
+														}
+														usuarioId={usuario.uid}
+														membrosInfo={grupoMembrosInfo}
 													/>
 												)}
 											/>
