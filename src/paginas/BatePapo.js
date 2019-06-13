@@ -31,7 +31,8 @@ const useStyles = makeStyles(theme => ({
 		paddingTop: 0,
 		paddingBottom: 0,
 		display: 'flex',
-		flexDirection: 'column'
+		flexDirection: 'column',
+		overflow: 'hidden'
 	}
 }));
 
@@ -129,7 +130,7 @@ const BatePapo = ({
 				flexDirection="column"
 				alignItems="flex-start"
 				position="relative"
-				css={{ overflowY: 'scroll' }}
+				css={{ overflowY: 'scroll', '-webkit-overflow-scrolling': 'touch' }}
 				ref={ref => {
 					if (ref) {
 						listaRef.current = ref;

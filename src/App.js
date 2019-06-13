@@ -35,6 +35,10 @@ import Visualizar from './paginas/Visualizar';
 import Convite from './paginas/Convite';
 import BatePapo from './paginas/BatePapo';
 
+import smoothscroll from 'smoothscroll-polyfill';
+
+smoothscroll.polyfill();
+
 const config = {
 	apiKey: 'AIzaSyBRYebCm20oXGiGoU9Njl9PtAADQ8OC468',
 	authDomain: 'fazer-dev-4cd5b.firebaseapp.com',
