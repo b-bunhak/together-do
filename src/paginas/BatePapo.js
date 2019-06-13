@@ -2,10 +2,13 @@ import React, { useState, useRef } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import Card from '@material-ui/core/Card';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import SendIcon from '@material-ui/icons/Send';
+import ArrowDownCircleIcon from '@material-ui/icons/ArrowDropDownCircle';
+import Slide from '@material-ui/core/Slide';
 
 import Box from '@material-ui/core/Box';
 
@@ -99,15 +102,18 @@ const BatePapo = ({
 
 	const mensagensCount = useRef(0);
 
+	const inputContainerRef = useRef();
+
 	const [scroll, setScroll] = useState(true);
 
 	function scrollToBottom() {
 		if (
+			listaRef.current &&
 			listaRef.current.scrollTop !==
-			listaRef.current.scrollHeight - listaRef.current.clientHeight
+				listaRef.current.scrollHeight - listaRef.current.offsetHeight
 		) {
 			listaRef.current.scroll({
-				top: listaRef.current.scrollHeight - listaRef.current.clientHeight,
+				top: listaRef.current.scrollHeight - listaRef.current.offsetHeight,
 				behavior: 'smooth'
 			});
 		}
@@ -129,7 +135,7 @@ const BatePapo = ({
 						listaRef.current = ref;
 
 						if (firstRender.current) {
-							ref.scrollTop = ref.scrollHeight - ref.clientHeight;
+							ref.scrollTop = ref.scrollHeight - ref.offsetHeight;
 							firstRender.current = false;
 						}
 
@@ -143,14 +149,17 @@ const BatePapo = ({
 						!firstRender.current &&
 						scroll &&
 						mensagensCount.current === mensagens.length &&
-						e.target.scrollTop !== e.target.scrollHeight - e.target.clientHeight
+						e.target.scrollTop <=
+							e.target.scrollHeight -
+								e.target.offsetHeight -
+								inputContainerRef.current.offsetHeight * 2
 					) {
 						setScroll(false);
 					}
 
 					if (
 						mensagensCount.current !== mensagens.length &&
-						e.target.scrollTop === e.target.scrollHeight - e.target.clientHeight
+						e.target.scrollTop === e.target.scrollHeight - e.target.offsetHeight
 					) {
 						mensagensCount.current = mensagens.length;
 					}
@@ -159,7 +168,7 @@ const BatePapo = ({
 						!firstRender.current &&
 						!scroll &&
 						mensagensCount.current === mensagens.length &&
-						e.target.scrollTop === e.target.scrollHeight - e.target.clientHeight
+						e.target.scrollTop === e.target.scrollHeight - e.target.offsetHeight
 					) {
 						setScroll(true);
 					}
@@ -191,36 +200,57 @@ const BatePapo = ({
 				</FlipMove>
 			</Box>
 
-			<Box component="form" mt="auto" mb={1} mx={1.5}>
-				<TextField
-					fullWidth
-					multiline
-					rowsMax="4"
-					variant="outlined"
-					InputProps={{
-						endAdornment: (
-							<InputAdornment position="end">
-								<IconButton
-									edge="end"
-									color="primary"
-									type="submit"
-									onClick={e => {
-										e.preventDefault();
-										enviarMensagem(input);
-										setInput('');
-									}}
-								>
-									<SendIcon />
-								</IconButton>
-							</InputAdornment>
-						)
-					}}
-					value={input}
-					onChange={e => {
-						setInput(e.target.value);
-						scrollToBottom();
-					}}
-				/>
+			<Box position="relative" ref={inputContainerRef}>
+				<Slide direction="left" in={!scroll}>
+					<Box
+						component={Card}
+						position="absolute"
+						mb={1}
+						pr={2.5}
+						css={{
+							bottom: '100%',
+							right: 0,
+							borderTopRightRadius: 0,
+							borderBottomRightRadius: 0
+						}}
+					>
+						<IconButton edge="end" onClick={scrollToBottom}>
+							<ArrowDownCircleIcon />
+						</IconButton>
+					</Box>
+				</Slide>
+
+				<Box component="form" mt="auto" mb={1} mx={1.5}>
+					<TextField
+						fullWidth
+						multiline
+						rowsMax="4"
+						variant="outlined"
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<IconButton
+										edge="end"
+										color="primary"
+										type="submit"
+										onClick={e => {
+											e.preventDefault();
+											enviarMensagem(input);
+											setScroll(true);
+											setInput('');
+										}}
+									>
+										<SendIcon />
+									</IconButton>
+								</InputAdornment>
+							)
+						}}
+						value={input}
+						onChange={e => {
+							setInput(e.target.value);
+						}}
+					/>
+				</Box>
 			</Box>
 		</div>
 	);
