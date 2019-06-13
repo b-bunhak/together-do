@@ -206,7 +206,7 @@ const BatePapo = ({
 					<Box
 						component={Card}
 						position="absolute"
-						mb={1}
+						mb={2}
 						pr={2.5}
 						css={{
 							bottom: '100%',
