@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -93,19 +93,79 @@ const BatePapo = ({
 
 	const [input, setInput] = useState('');
 
+	const firstRender = useRef(true);
+
+	const listaRef = useRef();
+
+	const mensagensCount = useRef(0);
+
+	const [scroll, setScroll] = useState(true);
+
+	function scrollToBottom() {
+		if (
+			listaRef.current.scrollTop !==
+			listaRef.current.scrollHeight - listaRef.current.clientHeight
+		) {
+			listaRef.current.scroll({
+				top: listaRef.current.scrollHeight - listaRef.current.clientHeight,
+				behavior: 'smooth'
+			});
+		}
+	}
+
 	return (
 		<div className={classes.pagina}>
 			<Box
-				clone
 				display="flex"
 				flex={1}
 				p={1}
 				px={2}
 				flexDirection="column"
 				alignItems="flex-start"
+				position="relative"
 				css={{ overflowY: 'scroll' }}
+				ref={ref => {
+					if (ref) {
+						listaRef.current = ref;
+
+						if (firstRender.current) {
+							ref.scrollTop = ref.scrollHeight - ref.clientHeight;
+							firstRender.current = false;
+						}
+
+						if (scroll) {
+							scrollToBottom();
+						}
+					}
+				}}
+				onScroll={e => {
+					if (
+						!firstRender.current &&
+						scroll &&
+						mensagensCount.current === mensagens.length &&
+						e.target.scrollTop !== e.target.scrollHeight - e.target.clientHeight
+					) {
+						setScroll(false);
+					}
+
+					if (
+						mensagensCount.current !== mensagens.length &&
+						e.target.scrollTop === e.target.scrollHeight - e.target.clientHeight
+					) {
+						mensagensCount.current = mensagens.length;
+					}
+
+					if (
+						!firstRender.current &&
+						!scroll &&
+						mensagensCount.current === mensagens.length &&
+						e.target.scrollTop === e.target.scrollHeight - e.target.clientHeight
+					) {
+						setScroll(true);
+					}
+				}}
 			>
-				<FlipMove>
+				<FlipMove typeName={null}>
 					{mensagens.map((mensagen, index, mensagens) => {
 						const anterior = mensagens[index - 1];
 						const proximo = mensagens[index + 1];
@@ -156,7 +216,10 @@ const BatePapo = ({
 						)
 					}}
 					value={input}
-					onChange={e => setInput(e.target.value)}
+					onChange={e => {
+						setInput(e.target.value);
+						scrollToBottom();
+					}}
 				/>
 			</Box>
 		</div>
