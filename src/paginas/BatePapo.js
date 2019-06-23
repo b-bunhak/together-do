@@ -12,6 +12,8 @@ import Slide from '@material-ui/core/Slide';
 
 import Box from '@material-ui/core/Box';
 
+import indigo from '@material-ui/core/colors/indigo';
+
 import { format } from 'date-fns';
 
 import FlipMove from 'react-flip-move';
@@ -19,10 +21,18 @@ import FlipMove from 'react-flip-move';
 const useStyles = makeStyles(theme => ({
 	'@global': {
 		html: {
-			height: '100%'
+			height: '100%',
+			margin: 0,
+			padding: 0
 		},
-		body: { height: '100%' },
-		'#root': { height: '100%', display: 'flex', flexDirection: 'column' }
+		body: { height: '100%', margin: 0, padding: 0 },
+		'#root': {
+			height: '100%',
+			display: 'flex',
+			flexDirection: 'column',
+			margin: 0,
+			padding: 0
+		}
 	},
 
 	pagina: {
@@ -50,7 +60,7 @@ const Mensagem = React.forwardRef(
 		ref
 	) => (
 		<Box
-			bgcolor={enviada ? 'primary.dark' : 'primary.light'}
+			bgcolor={enviada ? indigo[600] : indigo['A200']}
 			color="primary.contrastText"
 			borderRadius="borderRadius"
 			alignSelf={enviada ? 'flex-end' : 'flex-start'}
