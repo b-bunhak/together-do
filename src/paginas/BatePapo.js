@@ -246,7 +246,9 @@ const BatePapo = ({
 										type="submit"
 										onClick={e => {
 											e.preventDefault();
-											enviarMensagem(input);
+											if (input.trim()) {
+												enviarMensagem(input);
+											}
 											setScroll(true);
 											setInput('');
 										}}
