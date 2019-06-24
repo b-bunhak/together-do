@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import Card from '@material-ui/core/Card';
 import TextField from '@material-ui/core/TextField';
@@ -10,6 +10,8 @@ import SendIcon from '@material-ui/icons/Send';
 import ArrowDownCircleIcon from '@material-ui/icons/ArrowDropDownCircle';
 import Slide from '@material-ui/core/Slide';
 
+import { Typography } from '@material-ui/core';
+
 import Box from '@material-ui/core/Box';
 
 import indigo from '@material-ui/core/colors/indigo';
@@ -17,7 +19,8 @@ import indigo from '@material-ui/core/colors/indigo';
 import { format, isSameDay } from 'date-fns';
 
 import FlipMove from 'react-flip-move';
-import { Typography } from '@material-ui/core';
+
+import randomColor from 'randomcolor';
 
 const useStyles = makeStyles(theme => ({
 	'@global': {
@@ -56,46 +59,64 @@ const Mensagem = React.forwardRef(
 			enviada = false,
 			anteriorMesmoAutor = false,
 			proximoMesmoAutor = false,
+			hideAutor,
 			...props
 		},
 		ref
-	) => (
-		<Box
-			bgcolor={enviada ? indigo[600] : indigo['A200']}
-			color="primary.contrastText"
-			borderRadius="borderRadius"
-			alignSelf={enviada ? 'flex-end' : 'flex-start'}
-			mt={anteriorMesmoAutor ? 0.15 : 1}
-			mb={proximoMesmoAutor ? 0.15 : 1}
-			p={1.25}
-			fontSize="body1.fontSize"
-			{...props}
-			ref={ref}
-		>
-			{autor && (
-				<Box
-					fontSize="subtitle2.fontSize"
-					fontWeight="subtitle2.fontWeight"
-					mb={1}
-				>
-					{autor}
-				</Box>
-			)}
-			{mensagem}
+	) => {
+		const theme = useTheme();
 
+		return (
 			<Box
-				fontSize="overline.fontSize"
-				fontWeight="overline.fontWeight"
-				display="inline-block"
-				mt={1.5}
-				mb={-1}
-				ml={2.5}
-				css={{ float: 'right', verticalAlign: 'bottom' }}
+				//bgcolor={enviada ? indigo[600] : indigo['A200']}
+				bgcolor={
+					enviada
+						? indigo[400]
+						: randomColor({ seed: autor.id, luminosity: 'light' })
+				}
+				//color="primary.contrastText"
+				color={
+					enviada
+						? 'primary.contrastText'
+						: theme.palette.getContrastText(
+								randomColor({ seed: autor.id, luminosity: 'light' })
+						  )
+				}
+				borderRadius="borderRadius"
+				alignSelf={enviada ? 'flex-end' : 'flex-start'}
+				mt={anteriorMesmoAutor ? 0.15 : 1}
+				mb={proximoMesmoAutor ? 0.15 : 1}
+				p={1.25}
+				fontSize="body1.fontSize"
+				{...props}
+				ref={ref}
 			>
-				{horario}
+				{!hideAutor && (
+					<Box
+						fontSize="subtitle2.fontSize"
+						fontWeight="subtitle2.fontWeight"
+						mb={1}
+						//color={randomColor({ seed: autor.id, luminosity: 'light' })}
+					>
+						{autor.nome}
+					</Box>
+				)}
+				{mensagem}
+
+				<Box
+					fontSize="overline.fontSize"
+					fontWeight="overline.fontWeight"
+					display="inline-block"
+					mt={1.5}
+					mb={-1}
+					ml={2.5}
+					css={{ float: 'right', verticalAlign: 'bottom' }}
+				>
+					{horario}
+				</Box>
 			</Box>
-		</Box>
-	)
+		);
+	}
 );
 
 const BatePapo = ({
@@ -224,13 +245,15 @@ const BatePapo = ({
 									proximoMesmoAutor={
 										proximo && proximo.autor === mensagen.autor
 									}
-									autor={
+									hideAutor={
 										anterior &&
 										anterior.autor === mensagen.autor &&
 										isSameDay(anterior.data, mensagen.data)
-											? undefined
-											: membrosInfo[mensagen.autor].nome
 									}
+									autor={{
+										id: mensagen.autor,
+										nome: membrosInfo[mensagen.autor].nome
+									}}
 									horario={format(mensagen.data, 'HH:mm')}
 									mensagem={mensagen.mensagen}
 								/>
