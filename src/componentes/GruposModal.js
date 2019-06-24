@@ -230,7 +230,7 @@ const GruposModal = ({
 									key={id}
 									button
 									component={Link}
-									to={gruposInfo[id].nome === 'Eu' ? '/eu' : `${id}`}
+									to={gruposInfo[id].nome === 'Eu' ? '/eu' : `/${id}`}
 									onClick={onClose}
 								>
 									<ListItemText primary={gruposInfo[id].nome} />

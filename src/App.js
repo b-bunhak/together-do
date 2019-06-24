@@ -5,7 +5,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -23,6 +23,10 @@ import Button from '@material-ui/core/Button';
 import ArrowRightIcon from '@material-ui/icons/MoreVert';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import Badge from '@material-ui/core/Badge';
+import ChatIcon from '@material-ui/icons/Chat';
+import ListIcon from '@material-ui/icons/ListAlt';
 
 import Box from '@material-ui/core/Box';
 
@@ -774,6 +778,31 @@ const App = ({ classes }) => {
 
 										<AppBar position="static">
 											<Toolbar>
+												{id !== 'eu' &&
+													(window.location.pathname === `/${grupoId}/chat` ? (
+														<Link
+															component={IconButton}
+															to={`/${grupoId}`}
+															color="primary"
+														>
+															<Box clone color="primary.contrastText">
+																<ListIcon />
+															</Box>
+														</Link>
+													) : (
+														<Badge variant="dot" color="secondary">
+															<Link
+																component={IconButton}
+																to={`/${grupoId}/chat`}
+																color="primary"
+															>
+																<Box clone color="primary.contrastText">
+																	<ChatIcon />
+																</Box>
+															</Link>
+														</Badge>
+													))}
+
 												<Box
 													clone
 													pr={1}
