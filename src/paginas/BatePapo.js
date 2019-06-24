@@ -14,9 +14,10 @@ import Box from '@material-ui/core/Box';
 
 import indigo from '@material-ui/core/colors/indigo';
 
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 
 import FlipMove from 'react-flip-move';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
 	'@global': {
@@ -190,22 +191,50 @@ const BatePapo = ({
 						const anterior = mensagens[index - 1];
 						const proximo = mensagens[index + 1];
 
+						const hoje = isSameDay(mensagen.data, new Date());
+
+						const mostrarData =
+							(!anterior && !hoje) ||
+							(anterior && !isSameDay(mensagen.data, anterior.data));
+
 						return (
-							<Mensagem
-								key={mensagen.id}
-								enviada={mensagen.autor === usuarioId}
-								anteriorMesmoAutor={
-									anterior && anterior.autor === mensagen.autor
-								}
-								proximoMesmoAutor={proximo && proximo.autor === mensagen.autor}
-								autor={
-									anterior && anterior.autor === mensagen.autor
-										? undefined
-										: membrosInfo[mensagen.autor].nome
-								}
-								horario={format(mensagen.data, 'HH:mm')}
-								mensagem={mensagen.mensagen}
-							/>
+							<React.Fragment key={mensagen.id}>
+								{mostrarData && (
+									<Box clone alignSelf="center" my={1}>
+										<Typography
+											variant="subtitle1"
+											align="center"
+											component="div"
+										>
+											{hoje
+												? 'Hoje'
+												: mensagen.data.toLocaleDateString(undefined, {
+														weekday: 'short',
+														day: '2-digit',
+														month: 'long'
+												  })}
+										</Typography>
+									</Box>
+								)}
+								<Mensagem
+									enviada={mensagen.autor === usuarioId}
+									anteriorMesmoAutor={
+										!anterior || anterior.autor === mensagen.autor
+									}
+									proximoMesmoAutor={
+										proximo && proximo.autor === mensagen.autor
+									}
+									autor={
+										anterior &&
+										anterior.autor === mensagen.autor &&
+										isSameDay(anterior.data, mensagen.data)
+											? undefined
+											: membrosInfo[mensagen.autor].nome
+									}
+									horario={format(mensagen.data, 'HH:mm')}
+									mensagem={mensagen.mensagen}
+								/>
+							</React.Fragment>
 						);
 					})}
 				</FlipMove>
