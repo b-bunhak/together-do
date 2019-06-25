@@ -822,7 +822,11 @@ const App = ({ classes }) => {
 															</Box>
 														</Link>
 													) : (
-														<Badge variant="dot" color="secondary">
+														<Badge
+															variant="dot"
+															color="secondary"
+															invisible={true}
+														>
 															<Link
 																component={IconButton}
 																to={`/${grupoId}/chat`}
