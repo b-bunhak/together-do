@@ -554,31 +554,63 @@ const App = ({ classes }) => {
 	}
 
 	function criarGrupo(nome) {
+		const batch = firebase.firestore().batch();
+
 		const gruposRef = firebase
 			.firestore()
 			.collection('grupos')
 			.doc();
 
-		return gruposRef.set({
+		batch.set(gruposRef, {
 			id: gruposRef.id,
 			nome,
 			membros: [usuario.uid],
 			admins: [usuario.uid]
 		});
+
+		const gruposPublicoRef = firebase
+			.firestore()
+			.collection('gruposPublico')
+			.doc(gruposRef.id);
+
+		batch.set(gruposPublicoRef, {
+			id: gruposRef.id,
+			nome
+		});
+
+		return batch.commit();
 	}
 
 	function alterarGrupoNome(grupoId, nome) {
+		const batch = firebase.firestore().batch();
+
 		const gruposRef = firebase
 			.firestore()
 			.collection('grupos')
 			.doc(grupoId);
 
-		return gruposRef.set(
+		batch.set(
+			gruposRef,
 			{
 				nome
 			},
 			{ merge: true }
 		);
+
+		const gruposPublicoRef = firebase
+			.firestore()
+			.collection('gruposPublico')
+			.doc(grupoId);
+
+		batch.set(
+			gruposPublicoRef,
+			{
+				nome
+			},
+			{ merge: true }
+		);
+
+		return batch.commit();
 	}
 
 	function novoMembro(grupo) {

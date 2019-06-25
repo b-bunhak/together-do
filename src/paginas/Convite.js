@@ -8,6 +8,7 @@ import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
+import { Typography, Box } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
 	'@global': {
@@ -21,6 +22,7 @@ const useStyles = makeStyles(theme => ({
 		height: '100%',
 		padding: theme.spacing(2),
 		display: 'flex',
+		flexDirection: 'column',
 		justifyContent: 'center',
 		alignItems: 'center'
 	}
@@ -46,6 +48,7 @@ const Convite = ({
 
 	const [conviteLodaing, setConviteLoading] = useState(true);
 	const [convite, setConvite] = useState(null);
+	const [grupo, setGrupo] = useState(null);
 
 	useEffect(() => {
 		setConviteLoading(true);
@@ -56,10 +59,18 @@ const Convite = ({
 			.doc(id)
 			.onSnapshot(
 				snapshot => {
-					ReactDOM.unstable_batchedUpdates(() => {
-						setConvite(snapshot.data());
-						setConviteLoading(false);
-					});
+					firebase
+						.firestore()
+						.collection('gruposPublico')
+						.doc(snapshot.get('grupo'))
+						.get()
+						.then(snap => {
+							ReactDOM.unstable_batchedUpdates(() => {
+								setConvite(snapshot.data());
+								setGrupo(snap.data());
+								setConviteLoading(false);
+							});
+						});
 				},
 				() => {
 					ReactDOM.unstable_batchedUpdates(() => {
@@ -74,14 +85,36 @@ const Convite = ({
 		!conviteLodaing &&
 		(convite ? (
 			<div className={classes.pagina}>
-				<Button
-					fullWidth
-					variant="contained"
-					color="primary"
-					onClick={() => aceitarConvite(id)}
-				>
-					Aceitar Convite
-				</Button>
+				<Box m="auto" textAlign="center">
+					<Box clone mb={1}>
+						<Typography variant="h6" component="div">
+							Convite do grupo:
+						</Typography>
+					</Box>
+					<Typography variant="h4" component="div">
+						{grupo.nome}
+					</Typography>
+				</Box>
+
+				<Box mb="auto">
+					<Box clone my={2}>
+						<Button
+							fullWidth
+							variant="contained"
+							color="primary"
+							onClick={() => aceitarConvite(id)}
+						>
+							Aceitar Convite
+						</Button>
+					</Box>
+					<Button
+						fullWidth
+						variant="contained"
+						onClick={() => setConvite(null)}
+					>
+						Voltar
+					</Button>
+				</Box>
 			</div>
 		) : (
 			<Redirect to="/" />
