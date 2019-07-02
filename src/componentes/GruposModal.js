@@ -195,6 +195,7 @@ const GruposModal = ({
 
 				{gruposInfo[grupoAtual] && gruposInfo[grupoAtual].membros && (
 					<Button
+						fullWidth
 						size="small"
 						variant="outlined"
 						onClick={() => setMembrosTelaAberta(!membrosTelaAberta)}
