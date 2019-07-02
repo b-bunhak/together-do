@@ -82,7 +82,11 @@ const Membros = ({
 		<Box px={2} display="flex" flexDirection="column" {...props}>
 			<Dialog
 				PaperProps={{ className: classes.conviteDialogPaper }}
-				open={Boolean(conviteId)}
+				open={Boolean(
+					conviteId &&
+						Array.isArray(convites) &&
+						convites.find(convite => convite.id === conviteId)
+				)}
 				onClose={() => setConviteId(null)}
 			>
 				<Snackbar
