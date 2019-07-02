@@ -61,7 +61,10 @@ yup.setLocale({
 });
 
 const schema = yup.object().shape({
-	item: yup.string().required(),
+	item: yup
+		.string()
+		.trim()
+		.required(),
 	feito: yup.date().nullable(),
 	dataEntrega: yup.date().nullable()
 });
