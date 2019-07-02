@@ -25,6 +25,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import TextField from '@material-ui/core/TextField';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import Box from '@material-ui/core/Box';
 
 import QRCode from 'qrcode.react';
@@ -57,6 +59,8 @@ const Membros = ({
 	const [menuId, setMenuId] = useState(null);
 
 	const [anchorEl, setAnchorEl] = useState(null);
+
+	const [saindoGrupo, setSaindoGrupo] = useState(false);
 
 	function handleClick(id, event) {
 		setMenuId(id);
@@ -223,7 +227,7 @@ const Membros = ({
 						fullWidth
 						variant="outlined"
 						color="primary"
-						disabled={criandoConvite}
+						disabled={criandoConvite || saindoGrupo}
 						onClick={() => {
 							setCriandoConvite(true);
 							novoMembro().then(conviteId => {
@@ -237,15 +241,29 @@ const Membros = ({
 				</Box>
 			)}
 
-			<Box clone my={1}>
+			<Box position="relative" my={1}>
 				<Button
 					fullWidth
 					color="secondary"
 					variant="outlined"
-					onClick={sairGrupo}
+					onClick={() => {
+						setSaindoGrupo(true);
+						sairGrupo();
+					}}
+					disabled={saindoGrupo}
 				>
 					Sair do Grupo
 				</Button>
+				{saindoGrupo && (
+					<Box
+						clone
+						color="secondary.main"
+						position="absolute"
+						css={{ top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
+					>
+						<CircularProgress size={24} />
+					</Box>
+				)}
 			</Box>
 		</Box>
 	);

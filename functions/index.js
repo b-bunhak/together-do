@@ -40,3 +40,35 @@ exports.aceitarConvite = functions.firestore
 
 		return null;
 	});
+
+exports.sairGrupo = functions.https.onCall((data, context) => {
+	const usuario = context.auth.uid;
+	const grupoId = data.grupo;
+
+	const db = admin.firestore();
+
+	const grupoRef = db.collection('grupos').doc(grupoId);
+
+	return db.runTransaction(transaction =>
+		transaction.get(grupoRef).then(grupoDoc => {
+			const admins = grupoDoc.get('admins');
+			const membros = grupoDoc.get('membros');
+
+			const novoAdmins = admins.filter(id => id !== usuario);
+			const novoMembros = membros.filter(id => id !== usuario);
+
+			if (novoAdmins.length === 0 && novoMembros.length > 0) {
+				novoAdmins.push(novoMembros[0]);
+			}
+
+			return transaction.set(
+				grupoRef,
+				{
+					admins: novoAdmins,
+					membros: novoMembros
+				},
+				{ merge: true }
+			);
+		})
+	);
+});

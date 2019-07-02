@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/functions';
 
 import { Route, Switch, Redirect, Link, withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
@@ -51,6 +52,7 @@ const config = {
 	messagingSenderId: '406109751094'
 };
 firebase.initializeApp(config);
+firebase.functions();
 
 const styles = theme => ({
 	spinnerContainer: {
@@ -712,33 +714,9 @@ const App = ({ classes, location }) => {
 	}
 
 	function sairGrupo(grupoId) {
-		const db = firebase.firestore();
-
-		const grupoRef = db.collection('grupos').doc(grupoId);
-
-		return db
-			.runTransaction(transaction =>
-				transaction.get(grupoRef).then(grupoDoc => {
-					const admins = grupoDoc.get('admins');
-					const membros = grupoDoc.get('membros');
-
-					const novoAdmins = admins.filter(id => id !== usuario.uid);
-					const novoMembros = membros.filter(id => id !== usuario.uid);
-
-					if (novoAdmins.length === 0 && novoMembros.length > 0) {
-						novoAdmins.push(novoMembros[0]);
-					}
-
-					return transaction.set(
-						grupoRef,
-						{
-							admins: novoAdmins,
-							membros: novoMembros
-						},
-						{ merge: true }
-					);
-				})
-			)
+		return firebase
+			.functions()
+			.httpsCallable('sairGrupo')({ grupo: grupoId })
 			.then(() => setGrupos(grupos.filter(id => id !== grupoId)));
 	}
 
