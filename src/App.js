@@ -5,7 +5,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import { Route, Switch, Redirect, Link } from 'react-router-dom';
+import { Route, Switch, Redirect, Link, withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -66,7 +66,7 @@ const styles = theme => ({
 	}
 });
 
-const App = ({ classes }) => {
+const App = ({ classes, location }) => {
 	// Usuario
 	const [usuarioLoading, setUsuarioLoading] = useState(true);
 	const [usuario, setUsuario] = useState();
@@ -412,6 +412,8 @@ const App = ({ classes }) => {
 		}
 	}, [usuario, grupos]);
 
+	const [redirectGrupo, setRedirectGrupo] = useState(null);
+
 	/////////////
 
 	function adicionarItem(item, grupo = usuario.uid) {
@@ -573,6 +575,8 @@ const App = ({ classes }) => {
 			id: gruposRef.id,
 			nome
 		});
+
+		setRedirectGrupo(gruposRef.id);
 
 		return batch.commit();
 	}
@@ -743,6 +747,12 @@ const App = ({ classes }) => {
 		});
 	}
 
+	useEffect(() => {
+		if (redirectGrupo && location.pathname === `/${redirectGrupo}`) {
+			setRedirectGrupo(null);
+		}
+	}, [redirectGrupo, location.pathname]);
+
 	return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<React.Fragment>
@@ -754,6 +764,10 @@ const App = ({ classes }) => {
 					</div>
 				) : !usuario ? (
 					<Login />
+				) : redirectGrupo &&
+				  gruposInfo[redirectGrupo] &&
+				  location.pathname !== `/${redirectGrupo}` ? (
+					<Redirect to={`/${redirectGrupo}`} />
 				) : (
 					<Switch>
 						<Route
@@ -986,4 +1000,4 @@ const App = ({ classes }) => {
 	);
 };
 
-export default withStyles(styles)(App);
+export default withRouter(withStyles(styles)(App));

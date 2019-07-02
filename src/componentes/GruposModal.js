@@ -101,10 +101,7 @@ const GruposModal = ({
 						? alterarGrupoNome
 						: criarGrupo;
 
-					return submit(values.nome).then(() => {
-						fecharForm();
-						resetForm();
-					});
+					return submit(values.nome);
 				}}
 			>
 				{() => (
