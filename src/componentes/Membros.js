@@ -129,12 +129,7 @@ const Membros = ({
 
 				<DialogActions>
 					<Box clone mr="auto">
-						<Button
-							color="secondary"
-							onClick={() =>
-								deletarConvite(conviteId).then(() => setConviteId(null))
-							}
-						>
+						<Button color="secondary" onClick={() => deletarConvite(conviteId)}>
 							Deletar
 						</Button>
 					</Box>
