@@ -701,6 +701,16 @@ const App = ({ classes, location }) => {
 		return conviteRef.delete();
 	}
 
+	function aceitarConvite(convite) {
+		firebase
+			.firestore()
+			.collection('convites')
+			.doc(convite.id)
+			.set({ valido: false, usuarioAceito: usuario.uid }, { merge: true });
+
+		setRedirectGrupo(convite.grupo);
+	}
+
 	function sairGrupo(grupoId) {
 		const db = firebase.firestore();
 
@@ -781,7 +791,9 @@ const App = ({ classes, location }) => {
 						<Route
 							exact
 							path="/convite/:id"
-							render={routeProps => <Convite {...routeProps} />}
+							render={routeProps => (
+								<Convite aceitarConvite={aceitarConvite} {...routeProps} />
+							)}
 						/>
 
 						<Route path="/:id">

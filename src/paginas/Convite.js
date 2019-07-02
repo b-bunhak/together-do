@@ -28,18 +28,8 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-function aceitarConvite(id) {
-	firebase
-		.firestore()
-		.collection('convites')
-		.doc(id)
-		.set(
-			{ valido: false, usuarioAceito: firebase.auth().currentUser.uid },
-			{ merge: true }
-		);
-}
-
 const Convite = ({
+	aceitarConvite,
 	match: {
 		params: { id }
 	}
@@ -49,6 +39,7 @@ const Convite = ({
 	const [conviteLodaing, setConviteLoading] = useState(true);
 	const [convite, setConvite] = useState(null);
 	const [grupo, setGrupo] = useState(null);
+	const [conviteAceito, setConviteAceito] = useState(false);
 
 	useEffect(() => {
 		setConviteLoading(true);
@@ -65,11 +56,13 @@ const Convite = ({
 						.doc(snapshot.get('grupo'))
 						.get()
 						.then(snap => {
-							ReactDOM.unstable_batchedUpdates(() => {
-								setConvite(snapshot.data());
-								setGrupo(snap.data());
-								setConviteLoading(false);
-							});
+							if (!conviteAceito) {
+								ReactDOM.unstable_batchedUpdates(() => {
+									setConvite(snapshot.data());
+									setGrupo(snap.data());
+									setConviteLoading(false);
+								});
+							}
 						});
 				},
 				() => {
@@ -79,7 +72,7 @@ const Convite = ({
 					});
 				}
 			);
-	}, [id]);
+	}, [id, conviteAceito]);
 
 	return (
 		!conviteLodaing &&
@@ -102,7 +95,10 @@ const Convite = ({
 							fullWidth
 							variant="contained"
 							color="primary"
-							onClick={() => aceitarConvite(id)}
+							onClick={() => {
+								setConviteAceito(true);
+								aceitarConvite(convite);
+							}}
 						>
 							Aceitar Convite
 						</Button>
