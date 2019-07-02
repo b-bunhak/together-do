@@ -228,30 +228,34 @@ const Formulario = ({
 						{editar && (
 							<div className={classes.botaoDiv}>
 								{typeof deletar === 'function' && (
-									<Button
-										variant="contained"
-										type="button"
-										className={classes.botaoDeletar}
-										onClick={deletar}
-									>
-										Deletar
-									</Button>
+									<Box clone mr={1}>
+										<Button
+											variant="contained"
+											type="button"
+											className={classes.botaoDeletar}
+											onClick={deletar}
+										>
+											Deletar
+										</Button>
+									</Box>
 								)}
 
 								{typeof cancelar === 'function' && (
-									<Button
-										variant="contained"
-										type="button"
-										onClick={event => {
-											cancelar(event);
-											setTemDataEntrega(
-												Boolean(inicial && inicial.dataEntrega)
-											);
-											resetForm();
-										}}
-									>
-										Cancelar
-									</Button>
+									<Box clone mr={1}>
+										<Button
+											variant="contained"
+											type="button"
+											onClick={event => {
+												cancelar(event);
+												setTemDataEntrega(
+													Boolean(inicial && inicial.dataEntrega)
+												);
+												resetForm();
+											}}
+										>
+											Cancelar
+										</Button>
+									</Box>
 								)}
 
 								<Button variant="contained" type="submit" color="primary">
