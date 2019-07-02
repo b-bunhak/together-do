@@ -10,8 +10,7 @@ import List from '@material-ui/core/List';
 
 import IconButton from '@material-ui/core/IconButton';
 import BackIcon from '@material-ui/icons/ArrowBack';
-
-import Checkbox from '@material-ui/core/Checkbox';
+import UndoIcon from '@material-ui/icons/Undo';
 
 import Box from '@material-ui/core/Box';
 
@@ -93,10 +92,12 @@ const Feito = ({
 								{item.item}
 							</Typography>
 
-							<Checkbox
-								checked={!!item.feito}
-								onChange={e => alterarFeito(item.id, e.target.checked)}
-							/>
+							<IconButton
+								color="primary"
+								onClick={() => alterarFeito(item.id, false)}
+							>
+								<UndoIcon />
+							</IconButton>
 						</Box>
 					);
 				})}

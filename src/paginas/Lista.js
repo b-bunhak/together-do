@@ -17,8 +17,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import Button from '@material-ui/core/Button';
-
-import Checkbox from '@material-ui/core/Checkbox';
+import IconButton from '@material-ui/core/IconButton';
+import CheckIcon from '@material-ui/icons/CheckCircle';
 
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -209,12 +209,12 @@ const Lista = ({
 															</Box>
 														</Link>
 
-														<Checkbox
-															checked={!!item.feito}
-															onChange={e =>
-																alterarFeito(item.id, e.target.checked)
-															}
-														/>
+														<IconButton
+															color="primary"
+															onClick={() => alterarFeito(item.id, true)}
+														>
+															<CheckIcon />
+														</IconButton>
 													</Box>
 												)}
 											</Draggable>
