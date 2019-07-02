@@ -105,7 +105,7 @@ const Membros = ({
 				<Box clone display="flex" flexDirection="column" alignItems="center">
 					<DialogContent>
 						<QRCode
-							value={`${window.location.hostname}/convite/${conviteId}`}
+							value={`${window.location.origin}/convite/${conviteId}`}
 							renderAs={'svg'}
 						/>
 						<Box clone mt={1}>
@@ -115,7 +115,7 @@ const Membros = ({
 								type="text"
 								value={
 									conviteId
-										? `${window.location.hostname}/convite/${conviteId}`
+										? `${window.location.origin}/convite/${conviteId}`
 										: ''
 								}
 								inputProps={{
