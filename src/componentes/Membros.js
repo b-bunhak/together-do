@@ -52,14 +52,18 @@ const Membros = ({
 
 	const [conviteId, setConviteId] = useState(null);
 
+	const [menuId, setMenuId] = useState(null);
+
 	const [anchorEl, setAnchorEl] = useState(null);
 
-	function handleClick(event) {
+	function handleClick(id, event) {
+		setMenuId(id);
 		setAnchorEl(event.currentTarget);
 	}
 
 	function handleClose() {
 		setAnchorEl(null);
+		setMenuId(null);
 	}
 
 	function inputClick(event) {
@@ -119,6 +123,37 @@ const Membros = ({
 					<Button onClick={() => setConviteId(null)}>Fechar</Button>
 				</DialogActions>
 			</Dialog>
+
+			<Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+				{admins.includes(menuId) ? (
+					<MenuItem
+						onClick={() => {
+							removerAdmin(menuId);
+							handleClose();
+						}}
+					>
+						Remover Admin
+					</MenuItem>
+				) : (
+					<MenuItem
+						onClick={() => {
+							fazerAdmin(menuId);
+							handleClose();
+						}}
+					>
+						Fazer Admin
+					</MenuItem>
+				)}
+				<MenuItem
+					onClick={() => {
+						removerMembro(menuId);
+						handleClose();
+					}}
+				>
+					Remover Membro
+				</MenuItem>
+			</Menu>
+
 			<Box
 				clone
 				bgcolor="background.paper"
@@ -137,43 +172,12 @@ const Membros = ({
 									/>
 									{id !== usuarioId && admins.includes(usuarioId) && 'Admin' && (
 										<ListItemSecondaryAction>
-											<IconButton aria-label="Mais" onClick={handleClick}>
+											<IconButton
+												aria-label="Mais"
+												onClick={e => handleClick(id, e)}
+											>
 												<MoreVertIcon />
 											</IconButton>
-											<Menu
-												id="simple-menu"
-												anchorEl={anchorEl}
-												open={Boolean(anchorEl)}
-												onClose={handleClose}
-											>
-												{admins.includes(id) ? (
-													<MenuItem
-														onClick={() => {
-															removerAdmin(id);
-															handleClose();
-														}}
-													>
-														Remover Admin
-													</MenuItem>
-												) : (
-													<MenuItem
-														onClick={() => {
-															fazerAdmin(id);
-															handleClose();
-														}}
-													>
-														Fazer Admin
-													</MenuItem>
-												)}
-												<MenuItem
-													onClick={() => {
-														removerMembro(id);
-														handleClose();
-													}}
-												>
-													Remover Membro
-												</MenuItem>
-											</Menu>
 										</ListItemSecondaryAction>
 									)}
 								</ListItem>
