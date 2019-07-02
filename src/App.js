@@ -20,13 +20,12 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
-import ArrowRightIcon from '@material-ui/icons/MoreVert';
-import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import ChatIcon from '@material-ui/icons/Chat';
 import ListIcon from '@material-ui/icons/ListAlt';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 import Box from '@material-ui/core/Box';
 
@@ -54,9 +53,6 @@ const config = {
 firebase.initializeApp(config);
 
 const styles = theme => ({
-	sairBotao: {
-		marginLeft: 'auto'
-	},
 	spinnerContainer: {
 		position: 'fixed',
 		height: '100%',
@@ -812,65 +808,77 @@ const App = ({ classes }) => {
 											<Toolbar>
 												{id !== 'eu' &&
 													(window.location.pathname === `/${grupoId}/chat` ? (
-														<Link
-															component={IconButton}
-															to={`/${grupoId}`}
-															color="primary"
-														>
-															<Box clone color="primary.contrastText">
-																<ListIcon />
-															</Box>
-														</Link>
-													) : (
-														<Badge
-															variant="dot"
-															color="secondary"
-															invisible={true}
-														>
+														<Box clone mr={1.5}>
 															<Link
 																component={IconButton}
-																to={`/${grupoId}/chat`}
+																to={`/${grupoId}`}
 																color="primary"
 															>
 																<Box clone color="primary.contrastText">
-																	<ChatIcon />
+																	<ListIcon />
 																</Box>
 															</Link>
-														</Badge>
+														</Box>
+													) : (
+														<Box clone mr={1.5}>
+															<Badge
+																variant="dot"
+																color="secondary"
+																invisible={true}
+															>
+																<Link
+																	component={IconButton}
+																	to={`/${grupoId}/chat`}
+																	color="primary"
+																>
+																	<Box clone color="primary.contrastText">
+																		<ChatIcon />
+																	</Box>
+																</Link>
+															</Badge>
+														</Box>
 													))}
-
 												<Box
-													clone
-													pr={1}
-													m={1}
-													borderRadius="borderRadius"
+													flex={1}
+													color="inherit"
+													position="relative"
+													onClick={() => setGruposModalVisivel(true)}
 													border={1}
-													borderRight={0}
-													borderColor="inherit"
+													borderRadius="borderRadius"
+													py={0.75}
+													px={1}
+													my={1}
+													display="flex"
+													alignItems="center"
+													css={{ minWidth: 0 }}
 												>
-													<ButtonBase
-														color="inherit"
-														style={{
-															borderTopRightRadius: 0,
-															borderBottomRightRadius: 0
-														}}
-														onClick={() => setGruposModalVisivel(true)}
+													<Box
+														clone
+														position="absolute"
+														bgcolor="primary.main"
+														px={0.5}
+														css={{ top: '-25%' }}
 													>
-														<ArrowRightIcon />
-
-														<Typography variant="h6" component="div">
-															{grupoId && gruposInfo[grupoId].nome}
+														<Typography variant="caption" component="div">
+															Grupo
 														</Typography>
-													</ButtonBase>
+													</Box>
+													<Typography noWrap variant="h6" component="div">
+														{grupoId && gruposInfo[grupoId].nome}
+													</Typography>
+													<Box clone ml="auto">
+														<ArrowDropDownIcon />
+													</Box>
 												</Box>
 
-												<Button
-													color="inherit"
-													className={classes.sairBotao}
-													onClick={() => firebase.auth().signOut()}
-												>
-													Sair
-												</Button>
+												<Box clone ml={1.5}>
+													<Button
+														color="inherit"
+														onClick={() => firebase.auth().signOut()}
+													>
+														Sair
+													</Button>
+												</Box>
 											</Toolbar>
 										</AppBar>
 
