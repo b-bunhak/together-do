@@ -27,6 +27,8 @@ import TextField from '@material-ui/core/TextField';
 
 import Box from '@material-ui/core/Box';
 
+import QRCode from 'qrcode.react';
+
 const useStyles = makeStyles(theme => ({
 	conviteDialogPaper: { margin: theme.spacing(2), width: '100%' }
 }));
@@ -92,22 +94,30 @@ const Membros = ({
 
 				<DialogTitle>Comparthlhe esse link:</DialogTitle>
 
-				<DialogContent>
-					<TextField
-						fullWidth
-						variant="outlined"
-						type="text"
-						value={
-							conviteId
-								? `${window.location.hostname}/convite/${conviteId}`
-								: ''
-						}
-						inputProps={{
-							readOnly: true
-						}}
-						onClick={inputClick}
-					/>
-				</DialogContent>
+				<Box clone display="flex" flexDirection="column" alignItems="center">
+					<DialogContent>
+						<QRCode
+							value={`${window.location.hostname}/convite/${conviteId}`}
+							renderAs={'svg'}
+						/>
+						<Box clone mt={1}>
+							<TextField
+								fullWidth
+								variant="outlined"
+								type="text"
+								value={
+									conviteId
+										? `${window.location.hostname}/convite/${conviteId}`
+										: ''
+								}
+								inputProps={{
+									readOnly: true
+								}}
+								onClick={inputClick}
+							/>
+						</Box>
+					</DialogContent>
+				</Box>
 
 				<DialogActions>
 					<Box clone mr="auto">
