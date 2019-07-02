@@ -140,7 +140,7 @@ const GruposModal = ({
 				)}
 			</Formik>
 
-			<Box px={2} pt={1} pb={0} display="flex" alignItems="center">
+			<Box px={2} pt={1} pb={0} display="flex" alignItems="center" flex="none">
 				<Typography variant="h5" component="div">
 					Grupos
 				</Typography>
