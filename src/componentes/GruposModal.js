@@ -34,7 +34,10 @@ import * as yup from 'yup';
 import Membros from './Membros';
 
 const schema = yup.object().shape({
-	nome: yup.string().required()
+	nome: yup
+		.string()
+		.trim()
+		.required()
 });
 
 const useStyles = makeStyles(theme => ({
