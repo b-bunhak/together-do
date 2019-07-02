@@ -14,6 +14,8 @@ import UndoIcon from '@material-ui/icons/Undo';
 
 import Box from '@material-ui/core/Box';
 
+import FlipMove from 'react-flip-move';
+
 const styles = theme => ({
 	'@global': {
 		html: {
@@ -70,37 +72,39 @@ const Feito = ({
 			</Box>
 
 			<List>
-				{feito.map(itemId => {
-					const item = items.get(itemId);
+				<FlipMove>
+					{feito.map(itemId => {
+						const item = items.get(itemId);
 
-					return (
-						<Box
-							key={item.id}
-							borderBottom={1}
-							borderColor="divider"
-							display="flex"
-							component="li"
-							alignItems="center"
-							bgcolor="background.default"
-						>
-							<Typography
-								noWrap
-								component={Link}
-								to={`./feito/${item.id}`}
-								className={classes.itemLink}
+						return (
+							<Box
+								key={item.id}
+								borderBottom={1}
+								borderColor="divider"
+								display="flex"
+								component="li"
+								alignItems="center"
+								bgcolor="background.default"
 							>
-								{item.item}
-							</Typography>
+								<Typography
+									noWrap
+									component={Link}
+									to={`./feito/${item.id}`}
+									className={classes.itemLink}
+								>
+									{item.item}
+								</Typography>
 
-							<IconButton
-								color="primary"
-								onClick={() => alterarFeito(item.id, false)}
-							>
-								<UndoIcon />
-							</IconButton>
-						</Box>
-					);
-				})}
+								<IconButton
+									color="primary"
+									onClick={() => alterarFeito(item.id, false)}
+								>
+									<UndoIcon />
+								</IconButton>
+							</Box>
+						);
+					})}
+				</FlipMove>
 			</List>
 		</div>
 	);
