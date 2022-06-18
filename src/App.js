@@ -44,12 +44,12 @@ import smoothscroll from 'smoothscroll-polyfill';
 smoothscroll.polyfill();
 
 const config = {
-	apiKey: 'AIzaSyBRYebCm20oXGiGoU9Njl9PtAADQ8OC468',
-	authDomain: 'fazer-dev-4cd5b.firebaseapp.com',
-	databaseURL: 'https://fazer-dev-4cd5b.firebaseio.com',
-	projectId: 'fazer-dev-4cd5b',
-	storageBucket: 'fazer-dev-4cd5b.appspot.com',
-	messagingSenderId: '406109751094'
+	apiKey: process.env.REACT_APP_FB_APIKEY,
+	authDomain: process.env.REACT_APP_FB_AUTHDOMAIN,
+	projectId: process.env.REACT_APP_FB_PROJECTID,
+	storageBucket: process.env.REACT_APP_FB_STORAGEBUCKET,
+	messagingSenderId: process.env.REACT_APP_FB_MESSAGINGSENDERID,
+	appId: process.env.REACT_APP_FB_APPID,
 };
 firebase.initializeApp(config);
 firebase.functions();
