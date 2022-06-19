@@ -1,3 +1,25 @@
+# Together-Do
+
+## To-Do Colaborativo
+
+https://together-doo.web.app
+
+### Recursos
+
+- Lista de afazeres
+- Cria grupos para compartilhar afazeres com colaboradores
+- Chat para conversar com cada grupo
+- Atualizações em tempo real
+
+### Stack
+
+- React
+- Firebase
+
+---
+
+## ReadMe Create React App
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
